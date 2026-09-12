@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>游戏王群索引</title>
+<style>
+:root {
+  --bg: #0e1117;
+  --bg2: #161b24;
+  --card: #1c2330;
+  --line: #2a3344;
+  --text: #e8edf5;
+  --muted: #8b97ab;
+  --gold: #d4b15f;
+  --gold2: #f0d78c;
+  --blue: #6ea8ff;
+  --danger: #e57373;
+  --dead: #6b7380;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
+a { color: var(--blue); }
+.wrap { max-width: 960px; margin: 0 auto; padding: 20px 16px 80px; }
+header.hero {
+  background: linear-gradient(160deg, #1a2233 0%, #12161f 60%, #0e1117 100%);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 20px 16px;
+  margin-bottom: 14px;
+}
+header.hero h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: .04em; color: var(--gold2); }
+.sub { color: var(--muted); font-size: 13px; }
+.updated { margin-top: 10px; color: var(--gold); font-size: 13px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.btn {
+  border: 1px solid var(--line); background: var(--card); color: var(--text);
+  border-radius: 10px; padding: 7px 12px; cursor: pointer; font-size: 13px;
+}
+.btn:hover { border-color: var(--gold); color: var(--gold2); }
+.btn-gold { background: #3a3018; border-color: #6e5a28; color: var(--gold2); }
+.btn-danger { color: var(--danger); border-color: #5a3030; }
+.drop { position: relative; display: inline-block; }
+.drop-menu {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 30;
+  min-width: 180px; background: var(--bg2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.drop.open .drop-menu { display: block; }
+.drop-menu button {
+  display: block; width: 100%; text-align: left; border: 0; background: transparent;
+  color: var(--text); padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px;
+}
+.drop-menu button:hover { background: #2a2416; color: var(--gold2); }
+.search-card {
+  margin: 14px 0 12px;
+  padding: 16px;
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #2a2416, #161b24);
+  box-shadow: 0 0 0 4px rgba(212,177,95,.08);
+}
+.search-card label { display: block; color: var(--gold2); font-weight: 700; margin-bottom: 8px; font-size: 15px; }
+.search-card input {
+  width: 100%; background: #0e1117; border: 1px solid #6e5a28; color: var(--text);
+  border-radius: 12px; padding: 14px 16px; font-size: 18px; outline: none;
+}
+.search-card input:focus { border-color: var(--gold2); box-shadow: 0 0 0 3px rgba(240,215,140,.15); }
+.search-card .hintline { margin-top: 8px; color: var(--muted); font-size: 12px; }
+.letters {
+  position: sticky; top: 0; z-index: 20; background: rgba(14,17,23,.94);
+  backdrop-filter: blur(8px); padding: 8px 0; display: flex; flex-wrap: wrap; gap: 4px;
+  border-bottom: 1px solid var(--line); margin: 0 -16px 8px; padding-left: 16px; padding-right: 16px;
+}
+.letters a {
+  color: var(--muted); text-decoration: none; min-width: 28px; height: 28px; display: flex;
+  align-items: center; justify-content: center; border-radius: 6px; font-size: 12px; padding: 0 4px;
+}
+.letters a:hover { background: #2a2416; color: var(--gold2); }
+.hint { color: var(--muted); font-size: 13px; margin: 8px 0 16px; }
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 10px 0;
+}
+.card h2 { margin: 0 0 8px; font-size: 16px; color: var(--gold2); }
+.note { color: var(--muted); font-size: 13px; white-space: pre-wrap; }
+.featured { border-color: #6e5a28; background: linear-gradient(180deg, #2a2416, #1c2330); }
+.row {
+  display: grid; grid-template-columns: minmax(160px, 1.1fr) minmax(180px, 1.5fr);
+  gap: 8px 16px; padding: 10px 4px; border-bottom: 1px solid #232b38; align-items: start;
+}
+body.admin .row { grid-template-columns: minmax(140px, 1fr) minmax(160px, 1.2fr) minmax(90px, .7fr) auto; }
+@media (max-width: 720px) {
+  .row, body.admin .row { grid-template-columns: 1fr; }
+}
+.row:last-child { border-bottom: none; }
+.name { font-weight: 650; }
+.name.struck { text-decoration: line-through; color: var(--dead); }
+.ids { display: flex; flex-wrap: wrap; gap: 6px; }
+.idchip {
+  display: inline-flex; align-items: center; gap: 6px; background: var(--bg2);
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-family: ui-monospace, Consolas, monospace; font-size: 13px;
+}
+.idchip.dead { color: var(--dead); text-decoration: line-through; opacity: .75; }
+.idchip button {
+  border: 0; background: transparent; color: var(--gold); cursor: pointer; font-size: 12px; padding: 0 2px;
+}
+.tagnote { color: var(--muted); font-size: 12px; }
+.tags-cell { display: none; color: var(--muted); font-size: 12px; word-break: break-all; }
+body.admin .tags-cell { display: block; }
+.sec-h { margin: 22px 0 8px; padding-top: 8px; font-size: 22px; color: var(--gold); border-top: 1px solid var(--line); }
+.empty { color: var(--muted); padding: 24px 8px; }
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  background: #223; color: #fff; padding: 8px 14px; border-radius: 999px;
+  display: none; z-index: 50; border: 1px solid var(--gold);
+}
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; z-index: 40;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.modal {
+  background: var(--bg2); border: 1px solid var(--line); border-radius: 16px; padding: 18px;
+  width: min(560px, 100%); max-height: 90vh; overflow: auto;
+}
+.modal h3 { margin: 0 0 12px; color: var(--gold2); }
+.form-row { margin: 8px 0; }
+.form-row label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.form-row input, .form-row textarea, .form-row select {
+  width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--text);
+  border-radius: 8px; padding: 8px 10px; font: inherit;
+}
+.actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; align-items: center; }
+.admin-only { display: none; }
+body.admin .admin-only { display: inline-flex; }
+body.admin .admin-block { display: block; }
+.admin-block { display: none; }
+.pinbox { display: none; align-items: center; gap: 4px; font-size: 12px; color: var(--gold2); white-space: nowrap; }
+body.admin .pinbox { display: inline-flex; }
+.count { color: var(--muted); font-size: 12px; }
+footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+footer ul { padding-left: 18px; }
+.hide-dead .idchip.dead, .hide-dead .row.all-dead { display: none; }
+.about-feedback { margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1 id="pageTitle">游戏王群索引</h1>
+    <div class="sub" id="pageSub"></div>
+    <div class="updated" id="lastUpdate"></div>
+    <div class="toolbar">
+      <div class="drop" id="exportDrop">
+        <button class="btn" onclick="toggleExportMenu(event)">导出 ▾</button>
+        <div class="drop-menu">
+          <button type="button" onclick="exportWord()">导出到 Word</button>
+          <button type="button" onclick="exportTxt()">导出到记事本</button>
+          <button type="button" onclick="exportJSON()">导出 JSON 备份</button>
+        </div>
+      </div>
+      <button class="btn btn-gold" onclick="openSubmit()">提交新群</button>
+      <button class="btn" onclick="shareText()">复制为文本</button>
+      <button class="btn" onclick="toggleDead()">隐藏/显示已失效群号</button>
+      <button class="btn" id="adminBtn" onclick="openAdmin()">管理员</button>
+      <button class="btn btn-gold admin-only" onclick="openEditor(null)">新增条目</button>
+      <button class="btn admin-only" onclick="openMetaEditor()">编辑说明/页头</button>
+      <button class="btn admin-only" onclick="logoutAdmin()">退出管理</button>
+    </div>
+  </header>
+
+  <div class="card" id="aboutCard"></div>
+
+  <div class="search-card">
+    <label for="q">搜索卡组 / 别名 / 群号 / 标签</label>
+    <input id="q" type="search" placeholder="例如：废二、古生物、刺猬、闪刀姬、746902919" oninput="render()" autofocus>
+    <div class="hintline">不区分大小写。管理员填写的隐藏标签也会被搜到，普通浏览不会看到标签列。</div>
+  </div>
+
+  <div class="card featured" id="featuredCard"></div>
+
+  <div class="letters" id="letters"></div>
+  <div class="hint"><span class="count" id="count"></span> · 有效群号可点「复制」；已失效群号只显示删除线，不提供复制</div>
+  <div id="list"></div>
+
+  <footer>
+    <h2 style="color:var(--gold2);font-size:16px;">实用连接</h2>
+    <ul id="linkList"></ul>
+    <p id="footerNote"></p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+var BUILTIN = {"updated":"11/09/2026","title":"游戏王群索引","subtitle":"为防止不同翻译混淆，OCG/TCG 先行暂不录入暂时译名，直接显示原本日文/英文名称。待统一翻译后再替换。","about":"首先感谢所有提供群号的群友以及之前做索引的前辈们。大家都是这份索引的作者。\n\n名称基本上以中文全称（NW 译名）为准。没有明显字段的卡组，请直接搜索关键词，例如「刺猬」「废二」。多种叫法会尽量都标在别名/标签里。\n\n未 O 化的 TCG 系列以英文 + TCG 卡包显示。每个群号编辑时都验证过。QQ 经常不显示群名，请尽量用群号搜索。\n\n群炸了或有新群要收录，请加入反馈群。\n\n如果遇到群号搜不到等情况，多半是群炸了，或者你有新的群号想加入此索引，请加入：746902919 反馈给我，谢谢大家。群问题答案：形而上学枫叶。","feedbackQq":"746902919","feedbackAnswer":"形而上学枫叶","footerNote":"这是单文件网页：双击即可打开。别人提交的新群不会自动出现在你这份文件里，请继续用反馈群收集后，用管理员功能改你自己的这份，再把新文件发给群友。","links":[{"label":"网页卡查：百鸽","url":"https://ygocdb.com/?search="},{"label":"Mycard 萌卡平台","url":"https://mycard.moe/"},{"label":"Ygopro 模拟器","url":"https://ygo233.com/"},{"label":"Yu-Gi-Oh! 日文官网","url":"https://www.yugioh-card.com/japan/"},{"label":"OCG 禁卡表","url":"https://www.yugioh-card.com/japan/event/rankingduel/limitregulation/"},{"label":"ROTK 战报、环境解析","url":"https://roadoftheking.com/"}],"groups":[{"name":"Angelechy（TCG 1401 先行 象棋卡组）","aliases":["TCG 1401 先行 象棋卡组"],"section":"A","ids":[{"num":"897684891","note":"","dead":false},{"num":"1027246764","note":"","dead":false}],"extra":"","missing":false,"featured":true,"id":"featured","pinned":true,"tags":["TCG 1401 先行 象棋卡组"]},{"name":"ABC","aliases":[],"section":"A","ids":[{"num":"342521183","note":"","dead":true},{"num":"282713584","note":"新群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g1","tags":[],"pinned":false},{"name":"暗黑界","aliases":[],"section":"A","ids":[{"num":"43456429","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g2","tags":[],"pinned":false},{"name":"艾克佐迪亚（老埃）","aliases":["老埃"],"section":"A","ids":[{"num":"689960426","note":"","dead":false},{"num":"552984170","note":"千年的十字系列","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g3","tags":["老埃"],"pinned":false},{"name":"ASHENED（TCG 1203）","aliases":["TCG 1203"],"section":"A","ids":[{"num":"186955253","note":"","dead":false},{"num":"210315109","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g4","tags":["TCG 1203"],"pinned":false},{"name":"黯黑世界/恶魔娘","aliases":["恶魔娘"],"section":"A","ids":[{"num":"532919686","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g5","tags":["恶魔娘"],"pinned":false},{"name":"ARG☆S","aliases":[],"section":"A","ids":[{"num":"851774971","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g6","tags":[],"pinned":false},{"name":"不知火","aliases":[],"section":"B","ids":[{"num":"496218959","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g7","tags":[],"pinned":false},{"name":"彼岸","aliases":[],"section":"B","ids":[{"num":"480551042","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g8","tags":[],"pinned":false},{"name":"爆裂体","aliases":[],"section":"B","ids":[{"num":"1055206989","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g9","tags":[],"pinned":false},{"name":"冰结界","aliases":[],"section":"B","ids":[{"num":"271378609","note":"","dead":false},{"num":"702030195","note":"防爆临时群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g10","tags":[],"pinned":false},{"name":"宝玉兽","aliases":[],"section":"B","ids":[{"num":"906193591","note":"","dead":false},{"num":"581029604","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g11","tags":[],"pinned":false},{"name":"不死世界（不死均）","aliases":["不死均"],"section":"B","ids":[{"num":"169912529","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g12","tags":["不死均"],"pinned":false},{"name":"宝石骑士","aliases":[],"section":"B","ids":[{"num":"661721879","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g13","tags":[],"pinned":false},{"name":"伯吉斯异兽（古生物）","aliases":["古生物"],"section":"B","ids":[{"num":"553072667","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g14","tags":["古生物"],"pinned":false},{"name":"北极天熊","aliases":[],"section":"B","ids":[{"num":"759420027","note":"炸了","dead":true},{"num":"716445125","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g15","tags":[],"pinned":false},{"name":"变形斗士","aliases":[],"section":"B","ids":[{"num":"703727884","note":"新群","dead":false}],"extra":"","missing":false,"nameStruck":true,"id":"g16","tags":[],"pinned":false},{"name":"捕食植物","aliases":[],"section":"B","ids":[{"num":"206568519","note":"已解散","dead":true},{"num":"914927276","note":"","dead":false}],"extra":"","missing":false,"nameStruck":true,"id":"g17","tags":[],"pinned":false},{"name":"报社卡组/Metabeat（辉夜坏兽、次元系、雷王滑板）","aliases":["Metabeat（辉夜坏兽、次元系、雷王滑板）","辉夜坏兽","次元系","雷王滑板"],"section":"B","ids":[{"num":"748719498","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g18","tags":["Metabeat（辉夜坏兽、次元系、雷王滑板）","辉夜坏兽","次元系","雷王滑板"],"pinned":false},{"name":"冰水","aliases":[],"section":"B","ids":[{"num":"905544631","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g19","tags":[],"pinned":false},{"name":"白银城（拉比林斯、迷宫）","aliases":["拉比林斯","迷宫"],"section":"B","ids":[{"num":"598845747","note":"","dead":false},{"num":"909778249","note":"","dead":false},{"num":"601750400","note":"新大群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g20","tags":["拉比林斯","迷宫"],"pinned":false},{"name":"霸王门/霸王眷龙/扎克","aliases":["霸王眷龙","扎克"],"section":"B","ids":[{"num":"542105389","note":"","dead":false},{"num":"829023145","note":"疑似没了","dead":true}],"extra":"","missing":false,"nameStruck":false,"id":"g21","tags":["霸王眷龙","扎克"],"pinned":false},{"name":"百夫长","aliases":[],"section":"B","ids":[{"num":"389923360","note":"","dead":false},{"num":"522303750","note":"","dead":false},{"num":"710517874","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g22","tags":[],"pinned":false},{"name":"白斗气","aliases":[],"section":"B","ids":[{"num":"694227120","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g23","tags":[],"pinned":false},{"name":"百鬼罗刹","aliases":[],"section":"B","ids":[{"num":"717346070","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g24","tags":[],"pinned":false},{"name":"珀耳修斯/反击天使","aliases":["反击天使"],"section":"B","ids":[{"num":"923561723","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g25","tags":["反击天使"],"pinned":false},{"name":"白森林","aliases":[],"section":"B","ids":[{"num":"601480325","note":"","dead":false},{"num":"670403233","note":"","dead":false},{"num":"254245694","note":"","dead":false},{"num":"612092026","note":"","dead":false},{"num":"183918902","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g26","tags":[],"pinned":false},{"name":"不可见之手","aliases":[],"section":"B","ids":[{"num":"757463813","note":"","dead":false},{"num":"753205783","note":"","dead":false},{"num":"772457655","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g27","tags":[],"pinned":false},{"name":"白骨","aliases":[],"section":"B","ids":[{"num":"1018582039","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g28","tags":[],"pinned":false},{"name":"白鸦","aliases":[],"section":"B","ids":[{"num":"975827460","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g29","tags":[],"pinned":false},{"name":"超重武者","aliases":[],"section":"C","ids":[{"num":"581680622","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g30","tags":[],"pinned":false},{"name":"超级运动员（U.A.）","aliases":["U.A."],"section":"C","ids":[{"num":"1056818923","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g31","tags":["U.A."],"pinned":false},{"name":"虫惑魔","aliases":[],"section":"C","ids":[{"num":"125502182","note":"炸了","dead":false},{"num":"236202615","note":"貌似炸了","dead":false},{"num":"612517686","note":"","dead":false},{"num":"194252036","note":"","dead":false},{"num":"752837120","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g32","tags":[],"pinned":false},{"name":"超级量子（超量士）","aliases":["超量士"],"section":"C","ids":[{"num":"534642022","note":"已解散","dead":true},{"num":"678320732","note":"","dead":false},{"num":"1035853240","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g33","tags":["超量士"],"pinned":false},{"name":"磁石战士","aliases":[],"section":"C","ids":[{"num":"773602197","note":"","dead":false},{"num":"698818215","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g34","tags":[],"pinned":false},{"name":"齿轮齿轮/ギアギア","aliases":["ギアギア"],"section":"C","ids":[{"num":"810926366","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g35","tags":["ギアギア"],"pinned":false},{"name":"春化精","aliases":[],"section":"C","ids":[{"num":"709210794","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g36","tags":[],"pinned":false},{"name":"纯爱妖精","aliases":[],"section":"C","ids":[{"num":"595169317","note":"","dead":false},{"num":"600043345","note":"","dead":false},{"num":"348501781","note":"","dead":false},{"num":"902983126","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g37","tags":[],"pinned":false},{"name":"超越龙","aliases":[],"section":"C","ids":[],"extra":"暂缺","missing":true,"nameStruck":false,"id":"g38","tags":[],"pinned":false},{"name":"次世代","aliases":[],"section":"C","ids":[{"num":"693270221","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g39","tags":[],"pinned":false},{"name":"超级防卫机器人","aliases":[],"section":"C","ids":[{"num":"618254992","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g40","tags":[],"pinned":false},{"name":"尘妖","aliases":[],"section":"C","ids":[{"num":"965189836","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g41","tags":[],"pinned":false},{"name":"代行","aliases":[],"section":"D","ids":[{"num":"73760552","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g42","tags":[],"pinned":false},{"name":"电池人","aliases":[],"section":"D","ids":[{"num":"99570569","note":"大概似了","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g43","tags":[],"pinned":false},{"name":"弹丸","aliases":[],"section":"D","ids":[{"num":"632333094","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g44","tags":[],"pinned":false},{"name":"堕天使","aliases":[],"section":"D","ids":[{"num":"320963272","note":"","dead":false},{"num":"1067650092","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g45","tags":[],"pinned":false},{"name":"带菌刺猬","aliases":[],"section":"D","ids":[{"num":"163108741","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g46","tags":[],"pinned":false},{"name":"电子化天使","aliases":[],"section":"D","ids":[{"num":"524127490","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g47","tags":[],"pinned":false},{"name":"DD（异次元恶魔）","aliases":["异次元恶魔"],"section":"D","ids":[{"num":"422900212","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g48","tags":["异次元恶魔"],"pinned":false},{"name":"电子龙","aliases":[],"section":"D","ids":[{"num":"287259406","note":"疑似炸了","dead":false},{"num":"930070898","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g49","tags":[],"pinned":false},{"name":"电子暗黑（里电子）","aliases":["里电子"],"section":"D","ids":[{"num":"733782159","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g50","tags":["里电子"],"pinned":false},{"name":"电子界（码语拳）","aliases":["码语拳"],"section":"D","ids":[{"num":"683473505","note":"","dead":false},{"num":"1084500992","note":"","dead":false},{"num":"458821450","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g51","tags":["码语拳"],"pinned":false},{"name":"电脑堺","aliases":[],"section":"D","ids":[{"num":"1073519364","note":"","dead":true},{"num":"839740501","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g52","tags":[],"pinned":false},{"name":"地中族","aliases":[],"section":"D","ids":[{"num":"186562067","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g53","tags":[],"pinned":false},{"name":"帝王","aliases":[],"section":"D","ids":[{"num":"374181866","note":"","dead":false},{"num":"386303670","note":"","dead":false},{"num":"378312119","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g54","tags":[],"pinned":false},{"name":"点火骑士","aliases":[],"section":"D","ids":[{"num":"322951431","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g55","tags":[],"pinned":false},{"name":"电子光虫","aliases":[],"section":"D","ids":[{"num":"1078513712","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g56","tags":[],"pinned":false},{"name":"大日","aliases":[],"section":"D","ids":[{"num":"1006130293","note":"新群","dead":false},{"num":"183321392","note":"旧群，已无活人","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g57","tags":[],"pinned":false},{"name":"地缚神","aliases":[],"section":"D","ids":[{"num":"386674497","note":"","dead":false},{"num":"858957006","note":"","dead":false},{"num":"485683289","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g58","tags":[],"pinned":false},{"name":"电气","aliases":[],"section":"D","ids":[{"num":"877736027","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g59","tags":[],"pinned":false},{"name":"大精灵/万圣节","aliases":["万圣节"],"section":"D","ids":[{"num":"683585549","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g60","tags":["万圣节"],"pinned":false},{"name":"Evil☆Twin/邪恶☆双子","aliases":["邪恶☆双子"],"section":"E","ids":[{"num":"397861231","note":"","dead":false},{"num":"522151750","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g61","tags":["邪恶☆双子"],"pinned":false},{"name":"恩底弥翁/魔导兽","aliases":["魔导兽"],"section":"E","ids":[{"num":"984176626","note":"","dead":false},{"num":"764237088","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g62","tags":["魔导兽"],"pinned":false},{"name":"恶魔均（デーモン）","aliases":["デーモン"],"section":"E","ids":[{"num":"526243260","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g63","tags":["デーモン"],"pinned":false},{"name":"恶魔召唤","aliases":[],"section":"E","ids":[{"num":"304278144","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g64","tags":[],"pinned":false},{"name":"发条","aliases":[],"section":"F","ids":[{"num":"532544865","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g65","tags":[],"pinned":false},{"name":"芳香法师","aliases":[],"section":"F","ids":[{"num":"436544684","note":"疑似炸了","dead":true},{"num":"689124879","note":"","dead":false},{"num":"930604217","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g66","tags":[],"pinned":false},{"name":"方界","aliases":[],"section":"F","ids":[{"num":"177459422","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g67","tags":[],"pinned":false},{"name":"废铁","aliases":[],"section":"F","ids":[{"num":"934693634","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g68","tags":[],"pinned":false},{"name":"废品二重身（废二）","aliases":["废二"],"section":"F","ids":[{"num":"427968149","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g69","tags":["废二"],"pinned":false},{"name":"复仇死灵","aliases":[],"section":"F","ids":[{"num":"574367392","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g70","tags":[],"pinned":false},{"name":"方程式运动员（F.A.）","aliases":["F.A."],"section":"F","ids":[{"num":"599426879","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g71","tags":["F.A."],"pinned":false},{"name":"蜂军","aliases":[],"section":"F","ids":[{"num":"733197971","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g72","tags":[],"pinned":false},{"name":"风魔女","aliases":[],"section":"F","ids":[{"num":"566387454","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g73","tags":[],"pinned":false},{"name":"光道","aliases":[],"section":"G","ids":[{"num":"366463551","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g74","tags":[],"pinned":false},{"name":"刚鬼","aliases":[],"section":"G","ids":[{"num":"132040244","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g75","tags":[],"pinned":false},{"name":"鬼计","aliases":[],"section":"G","ids":[{"num":"362767966","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g76","tags":[],"pinned":false},{"name":"古代机械","aliases":[],"section":"G","ids":[{"num":"557862382","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g77","tags":[],"pinned":false},{"name":"光天使","aliases":[],"section":"G","ids":[{"num":"763678426","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g78","tags":[],"pinned":false},{"name":"共鸣者/红莲魔","aliases":["红莲魔"],"section":"G","ids":[{"num":"654588692","note":"","dead":false},{"num":"872498109","note":"备用","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g79","tags":["红莲魔"],"pinned":false},{"name":"G石人","aliases":[],"section":"G","ids":[{"num":"751824347","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g80","tags":[],"pinned":false},{"name":"古遗物","aliases":[],"section":"G","ids":[{"num":"858920662","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g81","tags":[],"pinned":false},{"name":"光与暗之龙","aliases":[],"section":"G","ids":[{"num":"712504024","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g82","tags":[],"pinned":false},{"name":"鬼骨冢（TCG MAMU先行）","aliases":["TCG MAMU先行"],"section":"G","ids":[{"num":"811123353","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g83","tags":["TCG MAMU先行"],"pinned":false},{"name":"GMX（TCG 1304先行恐龙主题）","aliases":["TCG 1304先行恐龙主题"],"section":"G","ids":[{"num":"1053687132","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g84","tags":["TCG 1304先行恐龙主题"],"pinned":false},{"name":"光与暗的仪式","aliases":[],"section":"G","ids":[{"num":"1094387932","note":"","dead":false},{"num":"1029796304","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g85","tags":[],"pinned":false},{"name":"艮鬼","aliases":[],"section":"G","ids":[{"num":"875184687","note":"","dead":false},{"num":"870237937","note":"二群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g86","tags":[],"pinned":false},{"name":"幻变骚灵","aliases":[],"section":"H","ids":[{"num":"562103812","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g87","tags":[],"pinned":false},{"name":"海皇/水精鳞（水产）","aliases":["水精鳞（水产）","水产"],"section":"H","ids":[{"num":"250652484","note":"","dead":false},{"num":"1059290295","note":"备用群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g88","tags":["水精鳞（水产）","水产"],"pinned":false},{"name":"黑羽","aliases":[],"section":"H","ids":[{"num":"671308639","note":"","dead":false},{"num":"94828188","note":"","dead":false},{"num":"659490982","note":"小群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g89","tags":[],"pinned":false},{"name":"黄金国","aliases":[],"section":"H","ids":[{"num":"578054085","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g90","tags":[],"pinned":false},{"name":"幻兽机","aliases":[],"section":"H","ids":[{"num":"227819223","note":"无法申请","dead":true},{"num":"642490248","note":"新群","dead":false}],"extra":"","missing":false,"nameStruck":true,"id":"g91","tags":[],"pinned":false},{"name":"化合兽","aliases":[],"section":"H","ids":[{"num":"669719265","note":"新群，老群已解散","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g92","tags":[],"pinned":false},{"name":"花札卫","aliases":[],"section":"H","ids":[{"num":"562914725","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g93","tags":[],"pinned":false},{"name":"幻影骑士团（PK）","aliases":["PK"],"section":"H","ids":[{"num":"169348052","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g94","tags":["PK"],"pinned":false},{"name":"火山","aliases":[],"section":"H","ids":[{"num":"178577525","note":"疑似死了","dead":true},{"num":"561751457","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g95","tags":[],"pinned":false},{"name":"幻煌","aliases":[],"section":"H","ids":[{"num":"701050200","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g96","tags":[],"pinned":false},{"name":"霍普","aliases":[],"section":"H","ids":[{"num":"305671236","note":"","dead":false},{"num":"913402508","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g97","tags":[],"pinned":false},{"name":"海晶少女","aliases":[],"section":"H","ids":[{"num":"714963426","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g98","tags":[],"pinned":false},{"name":"黑魔导","aliases":[],"section":"H","ids":[{"num":"182221697","note":"","dead":false},{"num":"1022228549","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g99","tags":[],"pinned":false},{"name":"护宝炮妖","aliases":[],"section":"H","ids":[{"num":"1037514561","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g100","tags":[],"pinned":false},{"name":"火灵天星（@Ignister）","aliases":["@Ignister"],"section":"H","ids":[{"num":"925338902","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g101","tags":["@Ignister"],"pinned":false},{"name":"海造贼","aliases":[],"section":"H","ids":[{"num":"105527899","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g102","tags":[],"pinned":false},{"name":"灰篮","aliases":[],"section":"H","ids":[{"num":"723076135","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g103","tags":[],"pinned":false},{"name":"海/海龙神","aliases":["海龙神"],"section":"H","ids":[{"num":"271565406","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g104","tags":["海龙神"],"pinned":false},{"name":"幻想魔族","aliases":[],"section":"H","ids":[{"num":"152699563","note":"","dead":false},{"num":"250727319","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g105","tags":[],"pinned":false},{"name":"荷鲁斯","aliases":[],"section":"H","ids":[{"num":"201874179","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g106","tags":[],"pinned":false},{"name":"黄金柜（小表）","aliases":["小表"],"section":"H","ids":[{"num":"761998477","note":"","dead":false},{"num":"775884916","note":"","dead":false},{"num":"817893752","note":"","dead":false},{"num":"240961542","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g107","tags":["小表"],"pinned":false},{"name":"幻龙均","aliases":[],"section":"H","ids":[{"num":"873164010","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g108","tags":[],"pinned":false},{"name":"化石","aliases":[],"section":"H","ids":[{"num":"750513763","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g109","tags":[],"pinned":false},{"name":"幻奏","aliases":[],"section":"H","ids":[{"num":"107028988","note":"","dead":false},{"num":"665379953","note":"","dead":false},{"num":"837494861","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g110","tags":[],"pinned":false},{"name":"黄金荣耀","aliases":[],"section":"H","ids":[{"num":"141153825","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g111","tags":[],"pinned":false},{"name":"化学结合","aliases":[],"section":"H","ids":[{"num":"991363169","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g112","tags":[],"pinned":false},{"name":"机关傀儡","aliases":[],"section":"J","ids":[{"num":"303795459","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g113","tags":[],"pinned":false},{"name":"机界骑士","aliases":[],"section":"J","ids":[{"num":"620810923","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g114","tags":[],"pinned":false},{"name":"剑斗兽","aliases":[],"section":"J","ids":[{"num":"291198131","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g115","tags":[],"pinned":false},{"name":"巨石遗物","aliases":[],"section":"J","ids":[{"num":"929484736","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g116","tags":[],"pinned":false},{"name":"机壳","aliases":[],"section":"J","ids":[{"num":"860753418","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g117","tags":[],"pinned":false},{"name":"疾行机人（SR）","aliases":["SR"],"section":"J","ids":[{"num":"768912443","note":"大群","dead":false},{"num":"991348009","note":"小群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g118","tags":["SR"],"pinned":false},{"name":"教导","aliases":[],"section":"J","ids":[{"num":"937082341","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g119","tags":[],"pinned":false},{"name":"甲虫装机","aliases":[],"section":"J","ids":[{"num":"189458721","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g120","tags":[],"pinned":false},{"name":"急袭猛禽（RR）","aliases":["RR"],"section":"J","ids":[{"num":"1005788704","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g121","tags":["RR"],"pinned":false},{"name":"惊乐园","aliases":[],"section":"J","ids":[{"num":"826211224","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g122","tags":[],"pinned":false},{"name":"机甲","aliases":[],"section":"J","ids":[{"num":"1063477752","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g123","tags":[],"pinned":false},{"name":"机块","aliases":[],"section":"J","ids":[{"num":"531280257","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g124","tags":[],"pinned":false},{"name":"军贯（寿司）","aliases":["寿司"],"section":"J","ids":[{"num":"512238518","note":"炸了","dead":false},{"num":"760978566","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g125","tags":["寿司"],"pinned":false},{"name":"机巧/カラクリ","aliases":["カラクリ"],"section":"J","ids":[{"num":"178202769","note":"疑似没了","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g126","tags":["カラクリ"],"pinned":false},{"name":"机巧/機巧","aliases":["機巧"],"section":"J","ids":[{"num":"478985162","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g127","tags":["機巧"],"pinned":false},{"name":"救祓少女","aliases":[],"section":"J","ids":[{"num":"735693306","note":"疑似炸了","dead":false},{"num":"609127957","note":"好像也炸了","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g128","tags":[],"pinned":false},{"name":"巨大战舰","aliases":[],"section":"J","ids":[{"num":"583709284","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g129","tags":[],"pinned":false},{"name":"机人","aliases":[],"section":"J","ids":[{"num":"976289186","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g130","tags":[],"pinned":false},{"name":"救援ACE","aliases":[],"section":"J","ids":[{"num":"558334581","note":"","dead":false},{"num":"596370473","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g131","tags":[],"pinned":false},{"name":"极神","aliases":[],"section":"J","ids":[{"num":"286911383","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g132","tags":[],"pinned":false},{"name":"进化","aliases":[],"section":"J","ids":[{"num":"727481708","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g133","tags":[],"pinned":false},{"name":"俱舍怒威族","aliases":[],"section":"J","ids":[{"num":"88156311","note":"已解散","dead":true},{"num":"663574083","note":"疑似满了","dead":false},{"num":"731834541","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g134","tags":[],"pinned":false},{"name":"机怪虫","aliases":[],"section":"J","ids":[{"num":"655271062","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g135","tags":[],"pinned":false},{"name":"金属化","aliases":[],"section":"J","ids":[{"num":"659747459","note":"","dead":false},{"num":"938305118","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g136","tags":[],"pinned":false},{"name":"蓟花","aliases":[],"section":"J","ids":[{"num":"760409269","note":"","dead":false},{"num":"1032294175","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g137","tags":[],"pinned":false},{"name":"机皇帝","aliases":[],"section":"J","ids":[{"num":"347010752","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g138","tags":[],"pinned":false},{"name":"纠罪巧（エニアクラフト）","aliases":["エニアクラフト"],"section":"J","ids":[{"num":"951864506","note":"","dead":false},{"num":"761708337","note":"","dead":false},{"num":"837401101","note":"","dead":false},{"num":"865649546","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g139","tags":["エニアクラフト"],"pinned":false},{"name":"空牙团","aliases":[],"section":"K","ids":[{"num":"550698584","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g140","tags":[],"pinned":false},{"name":"恐龙","aliases":[],"section":"K","ids":[{"num":"367341486","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g141","tags":[],"pinned":false},{"name":"科技属（T.G.）","aliases":["T.G."],"section":"K","ids":[{"num":"80330976","note":"已解散","dead":true},{"num":"368821481","note":"","dead":false}],"extra":"","missing":false,"nameStruck":true,"id":"g142","tags":["T.G."],"pinned":false},{"name":"卡通","aliases":[],"section":"K","ids":[{"num":"552929832","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g143","tags":[],"pinned":false},{"name":"珂珑公主","aliases":[],"section":"K","ids":[{"num":"707527186","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g144","tags":[],"pinned":false},{"name":"恐啡肽","aliases":[],"section":"K","ids":[{"num":"306771548","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g145","tags":[],"pinned":false},{"name":"刻魔","aliases":[],"section":"K","ids":[{"num":"623603973","note":"","dead":false},{"num":"521597636","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g146","tags":[],"pinned":false},{"name":"K9","aliases":[],"section":"K","ids":[{"num":"536598000","note":"","dead":false},{"num":"814021167","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g147","tags":[],"pinned":false},{"name":"骷髅炎鬼","aliases":[],"section":"K","ids":[{"num":"628379396","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g148","tags":[],"pinned":false},{"name":"六武众","aliases":[],"section":"L","ids":[{"num":"383493028","note":"","dead":false},{"num":"728635852","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g149","tags":[],"pinned":false},{"name":"炼装","aliases":[],"section":"L","ids":[{"num":"538374451","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g150","tags":[],"pinned":false},{"name":"龙骑兵团","aliases":[],"section":"L","ids":[{"num":"191492663","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g151","tags":[],"pinned":false},{"name":"六花","aliases":[],"section":"L","ids":[{"num":"1072767816","note":"疑似没了","dead":false},{"num":"947298364","note":"","dead":false},{"num":"648263608","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g152","tags":[],"pinned":false},{"name":"龙辉巧","aliases":[],"section":"L","ids":[{"num":"1140325145","note":"","dead":false},{"num":"272614102","note":"","dead":false},{"num":"751964005","note":"花活群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g153","tags":[],"pinned":false},{"name":"龙星","aliases":[],"section":"L","ids":[{"num":"348560636","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g154","tags":[],"pinned":false},{"name":"灵兽","aliases":[],"section":"L","ids":[{"num":"68876550","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g155","tags":[],"pinned":false},{"name":"列车","aliases":[],"section":"L","ids":[{"num":"831195679","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g156","tags":[],"pinned":false},{"name":"灵魂鸟","aliases":[],"section":"L","ids":[{"num":"304544929","note":"大概死了","dead":false},{"num":"877696128","note":"新群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g157","tags":[],"pinned":false},{"name":"雷龙","aliases":[],"section":"L","ids":[{"num":"823890482","note":"","dead":false},{"num":"908390350","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g158","tags":[],"pinned":false},{"name":"龙女仆","aliases":[],"section":"L","ids":[{"num":"538755280","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g159","tags":[],"pinned":false},{"name":"烙印","aliases":[],"section":"L","ids":[{"num":"877455406","note":"","dead":false},{"num":"299826872","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g160","tags":[],"pinned":false},{"name":"连锁烧","aliases":[],"section":"L","ids":[{"num":"806598772","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g161","tags":[],"pinned":false},{"name":"零件/ガジェット","aliases":["ガジェット"],"section":"L","ids":[{"num":"980293453","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g162","tags":["ガジェット"],"pinned":false},{"name":"龙剑士","aliases":[],"section":"L","ids":[{"num":"529325168","note":"","dead":false},{"num":"872018940","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g163","tags":[],"pinned":false},{"name":"蕾祸","aliases":[],"section":"L","ids":[{"num":"654961969","note":"","dead":false},{"num":"696276415","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g164","tags":[],"pinned":false},{"name":"栗子球","aliases":[],"section":"L","ids":[{"num":"961105844","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g165","tags":[],"pinned":false},{"name":"龙华","aliases":[],"section":"L","ids":[{"num":"649946182","note":"","dead":false},{"num":"277301084","note":"","dead":false},{"num":"936846840","note":"","dead":false},{"num":"716132292","note":"","dead":false},{"num":"679442272","note":"","dead":false},{"num":"651067607","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g166","tags":[],"pinned":false},{"name":"雷火沸石","aliases":[],"section":"L","ids":[{"num":"806601725","note":"","dead":false},{"num":"273878853","note":"","dead":false},{"num":"964814793","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g167","tags":[],"pinned":false},{"name":"灵使","aliases":[],"section":"L","ids":[{"num":"983378761","note":"","dead":false},{"num":"374514073","note":"疑似搜不到","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g168","tags":[],"pinned":false},{"name":"雷盟","aliases":[],"section":"L","ids":[{"num":"1079919259","note":"","dead":false},{"num":"664146020","note":"","dead":false},{"num":"724437251","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g169","tags":[],"pinned":false},{"name":"魔术师","aliases":[],"section":"M","ids":[{"num":"599953670","note":"已炸","dead":false},{"num":"149780701","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g170","tags":[],"pinned":false},{"name":"秘旋谍（SPYRAL）","aliases":["SPYRAL"],"section":"M","ids":[{"num":"771461355","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g171","tags":["SPYRAL"],"pinned":false},{"name":"命运女郎/占卜魔女","aliases":["占卜魔女"],"section":"M","ids":[{"num":"656392817","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g172","tags":["占卜魔女"],"pinned":false},{"name":"梦魔境","aliases":[],"section":"M","ids":[{"num":"950789173","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g173","tags":[],"pinned":false},{"name":"魔导/魔导书","aliases":["魔导书"],"section":"M","ids":[{"num":"152877576","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g174","tags":["魔导书"],"pinned":false},{"name":"魔救","aliases":[],"section":"M","ids":[{"num":"491217543","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g175","tags":[],"pinned":false},{"name":"魔玩具","aliases":[],"section":"M","ids":[{"num":"418088306","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g176","tags":[],"pinned":false},{"name":"魔界剧团","aliases":[],"section":"M","ids":[{"num":"367580731","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g177","tags":[],"pinned":false},{"name":"魔女术","aliases":[],"section":"M","ids":[{"num":"572675295","note":"","dead":false},{"num":"707523413","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g178","tags":[],"pinned":false},{"name":"魔偶甜点","aliases":[],"section":"M","ids":[{"num":"221050541","note":"","dead":false},{"num":"608246514","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g179","tags":[],"pinned":false},{"name":"魔弹","aliases":[],"section":"M","ids":[{"num":"656950189","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g180","tags":[],"pinned":false},{"name":"魔妖","aliases":[],"section":"M","ids":[{"num":"799030752","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g181","tags":[],"pinned":false},{"name":"溟界","aliases":[],"section":"M","ids":[{"num":"915592870","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g182","tags":[],"pinned":false},{"name":"魔键","aliases":[],"section":"M","ids":[{"num":"653333044","note":"","dead":false},{"num":"689942176","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g183","tags":[],"pinned":false},{"name":"秘异三变（突变体）","aliases":["突变体"],"section":"M","ids":[{"num":"980244330","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g184","tags":["突变体"],"pinned":false},{"name":"魔钟洞","aliases":[],"section":"M","ids":[{"num":"315113852","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g185","tags":[],"pinned":false},{"name":"魔轰神","aliases":[],"section":"M","ids":[{"num":"455274528","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g186","tags":[],"pinned":false},{"name":"漫读灵使","aliases":[],"section":"M","ids":[{"num":"348655530","note":"存疑，疑似群没了","dead":true},{"num":"876558491","note":"","dead":false},{"num":"321162109","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g187","tags":[],"pinned":false},{"name":"秘仪之力","aliases":[],"section":"M","ids":[{"num":"120381890","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g188","tags":[],"pinned":false},{"name":"梦见之妮穆蕾莉娅（寝姬）","aliases":["寝姬"],"section":"M","ids":[{"num":"753350840","note":"","dead":false},{"num":"782744040","note":"","dead":false},{"num":"519425907","note":"","dead":false},{"num":"646865991","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g189","tags":["寝姬"],"pinned":false},{"name":"门之守护者","aliases":[],"section":"M","ids":[{"num":"680027980","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g190","tags":[],"pinned":false},{"name":"莫忘","aliases":[],"section":"M","ids":[{"num":"659364157","note":"","dead":false},{"num":"325203966","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g191","tags":[],"pinned":false},{"name":"命运英雄（D-HERO）","aliases":["D-HERO"],"section":"M","ids":[{"num":"701882136","note":"已解散","dead":true},{"num":"700129581","note":"新群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g192","tags":["D-HERO"],"pinned":false},{"name":"M∀LICE","aliases":[],"section":"M","ids":[{"num":"566768759","note":"","dead":false},{"num":"614906702","note":"","dead":false},{"num":"151897152","note":"","dead":false},{"num":"701841171","note":"","dead":false},{"num":"876611077","note":"似了","dead":true},{"num":"707346240","note":"","dead":false},{"num":"835486032","note":"","dead":false},{"num":"864205370","note":"","dead":false},{"num":"228197534","note":"","dead":false},{"num":"807033771","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g193","tags":[],"pinned":false},{"name":"迷拟宝箱鬼","aliases":[],"section":"M","ids":[{"num":"984150370","note":"","dead":false},{"num":"976779420","note":"","dead":false},{"num":"299737955","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g194","tags":[],"pinned":false},{"name":"魔兽 加泽特/魔獣 ガーゼット/Maju Garzett","aliases":["魔獣 ガーゼット","Maju Garzett"],"section":"M","ids":[{"num":"1003100930","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g195","tags":["魔獣 ガーゼット","Maju Garzett"],"pinned":false},{"name":"魔瞳","aliases":[],"section":"M","ids":[{"num":"809621045","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g196","tags":[],"pinned":false},{"name":"奈芙提斯（凤凰神）","aliases":["凤凰神"],"section":"N","ids":[{"num":"1060161772","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g197","tags":["凤凰神"],"pinned":false},{"name":"泥头车（机甲部队FTK）","aliases":["机甲部队FTK"],"section":"N","ids":[{"num":"736942469","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g198","tags":["机甲部队FTK"],"pinned":false},{"name":"女武神","aliases":[],"section":"N","ids":[{"num":"771565900","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g199","tags":[],"pinned":false},{"name":"纳祭","aliases":[],"section":"N","ids":[{"num":"814976040","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g200","tags":[],"pinned":false},{"name":"破械","aliases":[],"section":"P","ids":[{"num":"139580574","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g201","tags":[],"pinned":false},{"name":"PSY","aliases":[],"section":"P","ids":[{"num":"413495903","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g202","tags":[],"pinned":false},{"name":"破坏剑","aliases":[],"section":"P","ids":[{"num":"337998925","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g203","tags":[],"pinned":false},{"name":"扑克骑士","aliases":[],"section":"P","ids":[{"num":"340129375","note":"","dead":false},{"num":"877397356","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g204","tags":[],"pinned":false},{"name":"爬虫妖","aliases":[],"section":"P","ids":[{"num":"594844045","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g205","tags":[],"pinned":false},{"name":"P.U.N.K.","aliases":[],"section":"P","ids":[{"num":"724014808","note":"","dead":false},{"num":"599501270","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g206","tags":[],"pinned":false},{"name":"青眼","aliases":[],"section":"Q","ids":[{"num":"373059886","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g207","tags":[],"pinned":false},{"name":"七音服","aliases":[],"section":"Q","ids":[{"num":"631013880","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g208","tags":[],"pinned":false},{"name":"企鹅","aliases":[],"section":"Q","ids":[{"num":"574913383","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g209","tags":[],"pinned":false},{"name":"青蛙","aliases":[],"section":"Q","ids":[{"num":"1040620050","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g210","tags":[],"pinned":false},{"name":"群豪","aliases":[],"section":"Q","ids":[{"num":"755598799","note":"","dead":false},{"num":"1021246907","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g211","tags":[],"pinned":false},{"name":"骑甲虫","aliases":[],"section":"Q","ids":[{"num":"718134174","note":"","dead":false},{"num":"791873495","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g212","tags":[],"pinned":false},{"name":"奇美拉/幻想魔族","aliases":["幻想魔族"],"section":"Q","ids":[{"num":"152699563","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g213","tags":["幻想魔族"],"pinned":false},{"name":"蔷薇","aliases":[],"section":"Q","ids":[{"num":"605780695","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g214","tags":[],"pinned":false},{"name":"千年（艾克佐迪亚相关）","aliases":["艾克佐迪亚相关"],"section":"Q","ids":[{"num":"552984170","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g215","tags":["艾克佐迪亚相关"],"pinned":false},{"name":"清净世界","aliases":[],"section":"Q","ids":[{"num":"624228858","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g216","tags":[],"pinned":false},{"name":"侵入魔人","aliases":[],"section":"Q","ids":[{"num":"459987212","note":"同时是入魔群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g217","tags":[],"pinned":false},{"name":"熔岩","aliases":[],"section":"R","ids":[{"num":"87910133","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g218","tags":[],"pinned":false},{"name":"入魔","aliases":[],"section":"R","ids":[{"num":"221806104","note":"","dead":false},{"num":"459987212","note":"同时是侵入魔人群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g219","tags":[],"pinned":false},{"name":"扰乱","aliases":[],"section":"R","ids":[{"num":"319132984","note":"","dead":false},{"num":"169527637","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g220","tags":[],"pinned":false},{"name":"忍者","aliases":[],"section":"R","ids":[{"num":"690791399","note":"","dead":false},{"num":"739687218","note":"新群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g221","tags":[],"pinned":false},{"name":"燃烧拳击手（BK）","aliases":["BK"],"section":"R","ids":[{"num":"574370899","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g222","tags":["BK"],"pinned":false},{"name":"人造人","aliases":[],"section":"R","ids":[{"num":"327277362","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g223","tags":[],"pinned":false},{"name":"R.B. （TCG 1301）","aliases":["TCG 1301"],"section":"R","ids":[{"num":"186407803","note":"","dead":false},{"num":"831570724","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g224","tags":["TCG 1301"],"pinned":false},{"name":"神数","aliases":[],"section":"S","ids":[{"num":"564541423","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g225","tags":[],"pinned":false},{"name":"斯摩夫（巨神鸟）","aliases":["巨神鸟"],"section":"S","ids":[{"num":"423080219","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g226","tags":["巨神鸟"],"pinned":false},{"name":"水晶机巧","aliases":[],"section":"S","ids":[{"num":"559245998","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g227","tags":[],"pinned":false},{"name":"圣骑士","aliases":[],"section":"S","ids":[{"num":"10101636","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g228","tags":[],"pinned":false},{"name":"双天","aliases":[],"section":"S","ids":[{"num":"1134462560","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g229","tags":[],"pinned":false},{"name":"森罗","aliases":[],"section":"S","ids":[{"num":"293060091","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g230","tags":[],"pinned":false},{"name":"十二兽","aliases":[],"section":"S","ids":[{"num":"418669984","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g231","tags":[],"pinned":false},{"name":"守护龙（龙link）","aliases":["龙link"],"section":"S","ids":[{"num":"545063818","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g232","tags":["龙link"],"pinned":false},{"name":"闪刀姬","aliases":[],"section":"S","ids":[{"num":"313051326","note":"","dead":false},{"num":"307377972","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g233","tags":[],"pinned":false},{"name":"圣天树","aliases":[],"section":"S","ids":[{"num":"151549541","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g234","tags":[],"pinned":false},{"name":"时劫者（时间潜行者）","aliases":["时间潜行者"],"section":"S","ids":[{"num":"620691706","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g235","tags":["时间潜行者"],"pinned":false},{"name":"抒情歌鸲（LL）","aliases":["LL"],"section":"S","ids":[{"num":"713442697","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g236","tags":["LL"],"pinned":false},{"name":"死狱乡","aliases":[],"section":"S","ids":[{"num":"966177586","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g237","tags":[],"pinned":false},{"name":"随风旅鸟","aliases":[],"section":"S","ids":[{"num":"453414878","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g238","tags":[],"pinned":false},{"name":"鲨鱼","aliases":[],"section":"S","ids":[{"num":"317628973","note":"","dead":false},{"num":"580073015","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g239","tags":[],"pinned":false},{"name":"三幻魔","aliases":[],"section":"S","ids":[{"num":"239154855","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g240","tags":[],"pinned":false},{"name":"三幻神","aliases":[],"section":"S","ids":[{"num":"958148054","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g241","tags":[],"pinned":false},{"name":"三极神","aliases":[],"section":"S","ids":[{"num":"286911383","note":"和女武神同","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g242","tags":[],"pinned":false},{"name":"圣夜","aliases":[],"section":"S","ids":[{"num":"1019970370","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g243","tags":[],"pinned":false},{"name":"神碑","aliases":[],"section":"S","ids":[{"num":"755429661","note":"","dead":false},{"num":"71572177","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g244","tags":[],"pinned":false},{"name":"兽带斗神","aliases":[],"section":"S","ids":[{"num":"632051971","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g245","tags":[],"pinned":false},{"name":"肆世坏","aliases":[],"section":"S","ids":[{"num":"917554357","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g246","tags":[],"pinned":false},{"name":"守墓","aliases":[],"section":"S","ids":[{"num":"417959381","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g247","tags":[],"pinned":false},{"name":"深渊之兽","aliases":[],"section":"S","ids":[{"num":"725617960","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g248","tags":[],"pinned":false},{"name":"圣果使","aliases":[],"section":"S","ids":[{"num":"708515033","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g249","tags":[],"pinned":false},{"name":"肃声","aliases":[],"section":"S","ids":[{"num":"621442945","note":"","dead":false},{"num":"550633038","note":"","dead":false},{"num":"695144300","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g250","tags":[],"pinned":false},{"name":"圣像骑士","aliases":[],"section":"S","ids":[{"num":"757076546","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g251","tags":[],"pinned":false},{"name":"蛇眼","aliases":[],"section":"S","ids":[{"num":"926198037","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g252","tags":[],"pinned":false},{"name":"圣刻","aliases":[],"section":"S","ids":[{"num":"362181307","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g253","tags":[],"pinned":false},{"name":"时空龙","aliases":[],"section":"S","ids":[{"num":"391547011","note":"主群","dead":false},{"num":"616441303","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g254","tags":[],"pinned":false},{"name":"森之圣兽/古代妖精","aliases":["古代妖精"],"section":"S","ids":[{"num":"957442536","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g255","tags":["古代妖精"],"pinned":false},{"name":"神艺","aliases":[],"section":"S","ids":[{"num":"605213911","note":"","dead":false},{"num":"983290686","note":"","dead":false},{"num":"983606236","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g256","tags":[],"pinned":false},{"name":"巳剑/御剑","aliases":["御剑"],"section":"S","ids":[{"num":"539901452","note":"","dead":false},{"num":"812996920","note":"","dead":false},{"num":"909933098","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g257","tags":["御剑"],"pinned":false},{"name":"水伶女","aliases":[],"section":"S","ids":[{"num":"243473516","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g258","tags":[],"pinned":false},{"name":"杀手调音","aliases":[],"section":"S","ids":[{"num":"550995720","note":"","dead":false},{"num":"757166886","note":"","dead":false},{"num":"657157463","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g259","tags":[],"pinned":false},{"name":"时间黑魔术师","aliases":[],"section":"S","ids":[{"num":"642125483","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g260","tags":[],"pinned":false},{"name":"塞尼特","aliases":[],"section":"S","ids":[{"num":"1062044037","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g261","tags":[],"pinned":false},{"name":"淘气仙星","aliases":[],"section":"T","ids":[{"num":"545047515","note":"已解散","dead":true},{"num":"215043335","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g262","tags":[],"pinned":false},{"name":"铁兽战线","aliases":[],"section":"T","ids":[{"num":"1136255234","note":"大群已恢复","dead":false},{"num":"424657248","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g263","tags":[],"pinned":false},{"name":"天威","aliases":[],"section":"T","ids":[{"num":"725455383","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g264","tags":[],"pinned":false},{"name":"天气","aliases":[],"section":"T","ids":[{"num":"610269485","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g265","tags":[],"pinned":false},{"name":"调皮宝贝","aliases":[],"section":"T","ids":[{"num":"815807864","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g266","tags":[],"pinned":false},{"name":"童话动物","aliases":[],"section":"T","ids":[{"num":"977486519","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g267","tags":[],"pinned":false},{"name":"廷达魔三角","aliases":[],"section":"T","ids":[{"num":"641180997","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g268","tags":[],"pinned":false},{"name":"Tistina（TCG 1201）","aliases":["TCG 1201"],"section":"T","ids":[{"num":"893577714","note":"","dead":false},{"num":"892546124","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g269","tags":["TCG 1201"],"pinned":false},{"name":"天杯龙/灿幻","aliases":["灿幻"],"section":"T","ids":[{"num":"540045435","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g270","tags":["灿幻"],"pinned":false},{"name":"无形噬体","aliases":[],"section":"W","ids":[{"num":"450076706","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g271","tags":[],"pinned":false},{"name":"王战","aliases":[],"section":"W","ids":[{"num":"709423250","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g272","tags":[],"pinned":false},{"name":"外星人","aliases":[],"section":"W","ids":[{"num":"109257217","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g273","tags":[],"pinned":false},{"name":"威风妖怪","aliases":[],"section":"W","ids":[{"num":"479034582","note":"","dead":false},{"num":"704132482","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g274","tags":[],"pinned":false},{"name":"文具电子人","aliases":[],"section":"W","ids":[{"num":"436527653","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g275","tags":[],"pinned":false},{"name":"纹章兽","aliases":[],"section":"W","ids":[{"num":"451702085","note":"","dead":false},{"num":"826845885","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g276","tags":[],"pinned":false},{"name":"武神","aliases":[],"section":"W","ids":[{"num":"688952069","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g277","tags":[],"pinned":false},{"name":"雾动机龙","aliases":[],"section":"W","ids":[{"num":"494122002","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g278","tags":[],"pinned":false},{"name":"无限起动","aliases":[],"section":"W","ids":[{"num":"119589020","note":"似了","dead":false},{"num":"893014102","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g279","tags":[],"pinned":false},{"name":"卫星闪灵","aliases":[],"section":"W","ids":[{"num":"828337080","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g280","tags":[],"pinned":false},{"name":"五世坏/末那愚子族","aliases":["末那愚子族"],"section":"W","ids":[{"num":"594771416","note":"","dead":false},{"num":"594826982","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g281","tags":["末那愚子族"],"pinned":false},{"name":"无常和声/异响鸣/华耳琴璃","aliases":["异响鸣","华耳琴璃"],"section":"W","ids":[{"num":"566467549","note":"","dead":false},{"num":"650087046","note":"","dead":false},{"num":"697536648","note":"","dead":false},{"num":"649520999","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g282","tags":["异响鸣","华耳琴璃"],"pinned":false},{"name":"未界域","aliases":[],"section":"W","ids":[{"num":"313067862","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g283","tags":[],"pinned":false},{"name":"玩具","aliases":[],"section":"W","ids":[{"num":"749785770","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g284","tags":[],"pinned":false},{"name":"武装龙","aliases":[],"section":"W","ids":[{"num":"115360354","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g285","tags":[],"pinned":false},{"name":"味美喵/黯蜜","aliases":["黯蜜"],"section":"W","ids":[{"num":"955879762","note":"","dead":false},{"num":"1009462104","note":"","dead":false},{"num":"1026391764","note":"","dead":false},{"num":"935142128","note":"吧群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g286","tags":["黯蜜"],"pinned":false},{"name":"玄化","aliases":[],"section":"X","ids":[{"num":"635456098","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g287","tags":[],"pinned":false},{"name":"先史遗产","aliases":[],"section":"X","ids":[{"num":"219277229","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g288","tags":[],"pinned":false},{"name":"新宇/新空间","aliases":["新空间"],"section":"X","ids":[{"num":"138832698","note":"","dead":false},{"num":"256507560","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g289","tags":["新空间"],"pinned":false},{"name":"星因士","aliases":[],"section":"X","ids":[{"num":"555056794","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g290","tags":[],"pinned":false},{"name":"星际仙踪（星兹、Kozmo）","aliases":["星兹","Kozmo"],"section":"X","ids":[{"num":"242616290","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g291","tags":["星兹","Kozmo"],"pinned":false},{"name":"吸血鬼","aliases":[],"section":"X","ids":[{"num":"130985605","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g292","tags":[],"pinned":false},{"name":"X-剑士","aliases":[],"section":"X","ids":[{"num":"132343721","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g293","tags":[],"pinned":false},{"name":"熏风","aliases":[],"section":"X","ids":[{"num":"656647164","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g294","tags":[],"pinned":false},{"name":"星杯","aliases":[],"section":"X","ids":[{"num":"296922802","note":"不知道还在不在","dead":false},{"num":"618254031","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g295","tags":[],"pinned":false},{"name":"贤者/大贤者/伟贤","aliases":["大贤者","伟贤"],"section":"X","ids":[{"num":"1083389209","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g296","tags":["大贤者","伟贤"],"pinned":false},{"name":"星圣","aliases":[],"section":"X","ids":[{"num":"91465579","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g297","tags":[],"pinned":false},{"name":"宣告者","aliases":[],"section":"X","ids":[{"num":"168032995","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g298","tags":[],"pinned":false},{"name":"鲜花骑士","aliases":[],"section":"X","ids":[{"num":"714767881","note":"疑似没了或被隐藏","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g299","tags":[],"pinned":false},{"name":"相剑","aliases":[],"section":"X","ids":[{"num":"727481044","note":"","dead":false},{"num":"762714541","note":"","dead":false},{"num":"607697984","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g300","tags":[],"pinned":false},{"name":"霞之谷","aliases":[],"section":"X","ids":[{"num":"29848856","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g301","tags":[],"pinned":false},{"name":"新式魔厨","aliases":[],"section":"X","ids":[{"num":"563641643","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g302","tags":[],"pinned":false},{"name":"星辰","aliases":[],"section":"X","ids":[{"num":"1023748612","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g303","tags":[],"pinned":false},{"name":"绚岚","aliases":[],"section":"X","ids":[{"num":"528465079","note":"","dead":false},{"num":"255857078","note":"","dead":false},{"num":"315119787","note":"","dead":false},{"num":"568577550","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g304","tags":[],"pinned":false},{"name":"小丑戏帮/道化","aliases":["道化"],"section":"X","ids":[{"num":"934673589","note":"","dead":false},{"num":"922357552","note":"","dead":false},{"num":"1067742465","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g305","tags":["道化"],"pinned":false},{"name":"英雄","aliases":[],"section":"Y","ids":[{"num":"581464191","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g306","tags":[],"pinned":false},{"name":"娱乐伙伴（EM）","aliases":["EM"],"section":"Y","ids":[{"num":"306863150","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g307","tags":["EM"],"pinned":false},{"name":"娱乐法师","aliases":[],"section":"Y","ids":[{"num":"536740773","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g308","tags":[],"pinned":false},{"name":"炎星","aliases":[],"section":"Y","ids":[{"num":"825338553","note":"","dead":false},{"num":"734850882","note":"新群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g309","tags":[],"pinned":false},{"name":"狱火机","aliases":[],"section":"Y","ids":[{"num":"235157931","note":"炸了","dead":false},{"num":"689912012","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g310","tags":[],"pinned":false},{"name":"云魔物","aliases":[],"section":"Y","ids":[{"num":"455844766","note":"","dead":false},{"num":"542265924","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g311","tags":[],"pinned":false},{"name":"亚马逊","aliases":[],"section":"Y","ids":[{"num":"892410012","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g312","tags":[],"pinned":false},{"name":"影依","aliases":[],"section":"Y","ids":[{"num":"331892847","note":"","dead":false},{"num":"693725698","note":"2群","dead":false},{"num":"706648123","note":"已解散","dead":true}],"extra":"","missing":false,"nameStruck":false,"id":"g313","tags":[],"pinned":false},{"name":"永火","aliases":[],"section":"Y","ids":[{"num":"434643693","note":"","dead":false},{"num":"1072089844","note":"2群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g314","tags":[],"pinned":false},{"name":"银河/光子","aliases":["光子"],"section":"Y","ids":[{"num":"240281781","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g315","tags":["光子"],"pinned":false},{"name":"炎王","aliases":[],"section":"Y","ids":[{"num":"81847381","note":"","dead":false},{"num":"82903953","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g316","tags":[],"pinned":false},{"name":"鹰身","aliases":[],"section":"Y","ids":[{"num":"335269226","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g317","tags":[],"pinned":false},{"name":"阳炎","aliases":[],"section":"Y","ids":[{"num":"955895059","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g318","tags":[],"pinned":false},{"name":"遗式","aliases":[],"section":"Y","ids":[{"num":"368828495","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g319","tags":[],"pinned":false},{"name":"月光","aliases":[],"section":"Y","ids":[{"num":"527381473","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g320","tags":[],"pinned":false},{"name":"影灵衣","aliases":[],"section":"Y","ids":[{"num":"568272198","note":"炸了","dead":true},{"num":"731763367","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g321","tags":[],"pinned":false},{"name":"异虫","aliases":[],"section":"Y","ids":[{"num":"284755428","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g322","tags":[],"pinned":false},{"name":"妖仙兽","aliases":[],"section":"Y","ids":[{"num":"264629042","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g323","tags":[],"pinned":false},{"name":"焰圣骑士","aliases":[],"section":"Y","ids":[{"num":"1079439117","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g324","tags":[],"pinned":false},{"name":"源数","aliases":[],"section":"Y","ids":[{"num":"808697063","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g325","tags":[],"pinned":false},{"name":"勇者token系列","aliases":[],"section":"Y","ids":[{"num":"599483247","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g326","tags":[],"pinned":false},{"name":"英豪","aliases":[],"section":"Y","ids":[{"num":"936391940","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g327","tags":[],"pinned":false},{"name":"音响战士","aliases":[],"section":"Y","ids":[{"num":"894815111","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g328","tags":[],"pinned":false},{"name":"壱世坏/珠泪哀歌族/泪冠哀歌","aliases":["珠泪哀歌族","泪冠哀歌"],"section":"Y","ids":[{"num":"1031490015","note":"","dead":false},{"num":"714314076","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g329","tags":["珠泪哀歌族","泪冠哀歌"],"pinned":false},{"name":"御巫","aliases":[],"section":"Y","ids":[{"num":"177071294","note":"","dead":false},{"num":"596502196","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g330","tags":[],"pinned":false},{"name":"异色眼","aliases":[],"section":"Y","ids":[{"num":"750104053","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g331","tags":[],"pinned":false},{"name":"于贝尔","aliases":[],"section":"Y","ids":[{"num":"823629028","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g332","tags":[],"pinned":false},{"name":"元素灵剑士","aliases":[],"section":"Y","ids":[{"num":"304946643","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g333","tags":[],"pinned":false},{"name":"悠悠","aliases":[],"section":"Y","ids":[{"num":"882598327","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g334","tags":[],"pinned":false},{"name":"炎之剑士","aliases":[],"section":"Y","ids":[{"num":"833506943","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g335","tags":[],"pinned":false},{"name":"野蛮人","aliases":[],"section":"Y","ids":[{"num":"967388595","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g336","tags":[],"pinned":false},{"name":"魊影","aliases":[],"section":"Y","ids":[{"num":"451155363","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g337","tags":[],"pinned":false},{"name":"原石","aliases":[],"section":"Y","ids":[{"num":"812341618","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g338","tags":[],"pinned":false},{"name":"阴影","aliases":[],"section":"Y","ids":[{"num":"310181376","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g339","tags":[],"pinned":false},{"name":"原质炉","aliases":[],"section":"Y","ids":[{"num":"821498516","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g340","tags":[],"pinned":false},{"name":"狱神","aliases":[],"section":"Y","ids":[{"num":"983290686","note":"","dead":false},{"num":"273378000","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g341","tags":[],"pinned":false},{"name":"耀圣","aliases":[],"section":"Y","ids":[{"num":"928509717","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g342","tags":[],"pinned":false},{"name":"妖精传姬","aliases":[],"section":"Y","ids":[{"num":"950284805","note":"","dead":false},{"num":"924680917","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g343","tags":[],"pinned":false},{"name":"亚特兰蒂斯/龙都","aliases":["龙都"],"section":"Y","ids":[{"num":"855791118","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g344","tags":["龙都"],"pinned":false},{"name":"预幻","aliases":[],"section":"Y","ids":[{"num":"776198778","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g345","tags":[],"pinned":false},{"name":"盈彩月夜/升月","aliases":["升月"],"section":"Y","ids":[{"num":"2166066321","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g346","tags":["升月"],"pinned":false},{"name":"异解△","aliases":[],"section":"Y","ids":[{"num":"797742136","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g347","tags":[],"pinned":false},{"name":"自奏圣乐/自鸣天琴","aliases":["自鸣天琴"],"section":"Z","ids":[{"num":"679433759","note":"","dead":false},{"num":"652074527","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g348","tags":["自鸣天琴"],"pinned":false},{"name":"自然","aliases":[],"section":"Z","ids":[{"num":"207360042","note":"","dead":false},{"num":"535105611","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g349","tags":[],"pinned":false},{"name":"真龙","aliases":[],"section":"Z","ids":[{"num":"172034427","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g350","tags":[],"pinned":false},{"name":"斩机","aliases":[],"section":"Z","ids":[{"num":"698293468","note":"疑似没了","dead":false},{"num":"433056411","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g351","tags":[],"pinned":false},{"name":"真红眼","aliases":[],"section":"Z","ids":[{"num":"569665406","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g352","tags":[],"pinned":false},{"name":"咒眼","aliases":[],"section":"Z","ids":[{"num":"665791803","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g353","tags":[],"pinned":false},{"name":"战华","aliases":[],"section":"Z","ids":[{"num":"106368270","note":"","dead":false},{"num":"1021379506","note":"2群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g354","tags":[],"pinned":false},{"name":"转生炎兽","aliases":[],"section":"Z","ids":[{"num":"242522012","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g355","tags":[],"pinned":false},{"name":"终焉夫妇（迪米斯，露茵）","aliases":["迪米斯","露茵"],"section":"Z","ids":[{"num":"1060376587","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g356","tags":["迪米斯","露茵"],"pinned":false},{"name":"治安战警队（S-Force）","aliases":["S-Force"],"section":"Z","ids":[{"num":"1163348075","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g357","tags":["S-Force"],"pinned":false},{"name":"占术姬","aliases":[],"section":"Z","ids":[{"num":"454061569","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g358","tags":[],"pinned":false},{"name":"战吼斗士","aliases":[],"section":"Z","ids":[{"num":"715757498","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g359","tags":[],"pinned":false},{"name":"罪/Sin","aliases":["Sin"],"section":"Z","ids":[{"num":"325389581","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g360","tags":["Sin"],"pinned":false},{"name":"召唤师","aliases":[],"section":"Z","ids":[{"num":"641528284","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g361","tags":[],"pinned":false},{"name":"征服斗魂/VS","aliases":["VS"],"section":"Z","ids":[{"num":"498144484","note":"","dead":false},{"num":"499233206","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g362","tags":["VS"],"pinned":false},{"name":"征龙","aliases":[],"section":"Z","ids":[{"num":"769328919","note":"","dead":false},{"num":"438378940","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g363","tags":[],"pinned":false},{"name":"罪宝","aliases":[],"section":"Z","ids":[{"num":"762435143","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g364","tags":[],"pinned":false},{"name":"朱罗纪","aliases":[],"section":"Z","ids":[{"num":"591197374","note":"","dead":false},{"num":"799592004","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g365","tags":[],"pinned":false},{"name":"正义盟军/A·O·J","aliases":["A·O·J"],"section":"Z","ids":[{"num":"527074469","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g366","tags":["A·O·J"],"pinned":false},{"name":"再世","aliases":[],"section":"Z","ids":[{"num":"1005600796","note":"","dead":false},{"num":"552646389","note":"","dead":false},{"num":"723277796","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g367","tags":[],"pinned":false},{"name":"左轮手枪","aliases":[],"section":"Z","ids":[{"num":"436086144","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g368","tags":[],"pinned":false},{"name":"终刻","aliases":[],"section":"Z","ids":[{"num":"929894655","note":"","dead":false},{"num":"817269169","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g369","tags":[],"pinned":false},{"name":"念动力讨论群","aliases":[],"section":"其他","ids":[{"num":"497549620","note":"","dead":false},{"num":"375840100","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g370","tags":[],"pinned":false},{"name":"爬虫族讨论群","aliases":[],"section":"其他","ids":[{"num":"656328286","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g371","tags":[],"pinned":false},{"name":"昆虫族讨论群","aliases":[],"section":"其他","ids":[{"num":"1055657036","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g372","tags":[],"pinned":false},{"name":"魔法师族","aliases":[],"section":"其他","ids":[{"num":"912743166","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g373","tags":[],"pinned":false},{"name":"地均/地地地/多种地属性均群","aliases":["地地地","多种地属性均群"],"section":"其他","ids":[{"num":"725636258","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g374","tags":["地地地","多种地属性均群"],"pinned":false},{"name":"各种游戏neta（沙罗曼蛇/巨大战舰）","aliases":["巨大战舰）","沙罗曼蛇","巨大战舰"],"section":"其他","ids":[{"num":"884807929","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g375","tags":["巨大战舰）","沙罗曼蛇","巨大战舰"],"pinned":false},{"name":"世坏南桐群","aliases":[],"section":"其他","ids":[{"num":"824559213","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g376","tags":[],"pinned":false},{"name":"幸运卡组（掷硬币/骰子/猜拳相关）","aliases":["骰子","猜拳相关）","掷硬币","猜拳相关"],"section":"其他","ids":[{"num":"120381890","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g377","tags":["骰子","猜拳相关）","掷硬币","猜拳相关"],"pinned":false},{"name":"陷阱怪兽","aliases":[],"section":"其他","ids":[{"num":"963937670","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g378","tags":[],"pinned":false},{"name":"伊西斯/现冥","aliases":["现冥"],"section":"其他","ids":[{"num":"275042051","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g379","tags":["现冥"],"pinned":false},{"name":"王家神殿","aliases":[],"section":"其他","ids":[{"num":"952607128","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g380","tags":[],"pinned":false},{"name":"天地星（霸胜星）","aliases":["霸胜星"],"section":"其他","ids":[{"num":"1053498689","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g381","tags":["霸胜星"],"pinned":false},{"name":"哥德温（地缚神/日月龙/神官）","aliases":["日月龙","神官）","地缚神","神官"],"section":"其他","ids":[{"num":"766673996","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g382","tags":["日月龙","神官）","地缚神","神官"],"pinned":false},{"name":"名推怪兽门卡组","aliases":[],"section":"其他","ids":[{"num":"1102341003","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g383","tags":[],"pinned":false},{"name":"混沌大群","aliases":[],"section":"其他","ids":[{"num":"1094387932","note":"","dead":false}],"extra":"包含以下 上古混沌均（开辟帝龙）、混沌仪式（混沌场）、混沌仪式（混沌形态）、光暗属性","missing":false,"nameStruck":false,"id":"g384","tags":[],"pinned":false},{"name":"混沌同调（双翼、女神）","aliases":["双翼","女神"],"section":"其他","ids":[{"num":"721939760","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g385","tags":["双翼","女神"],"pinned":false},{"name":"盖亚+龙骑士+超战士","aliases":[],"section":"其他","ids":[{"num":"945672746","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g386","tags":[],"pinned":false},{"name":"Duel Terminal故事群","aliases":[],"section":"其他","ids":[{"num":"528345743","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g387","tags":[],"pinned":false},{"name":"教导世界观故事群","aliases":[],"section":"其他","ids":[{"num":"299024582","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g388","tags":[],"pinned":false},{"name":"Vrains群","aliases":[],"section":"其他","ids":[{"num":"276017451","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g389","tags":[],"pinned":false},{"name":"Arc-V群","aliases":[],"section":"其他","ids":[{"num":"679881022","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g390","tags":[],"pinned":false},{"name":"Zexal群","aliases":[],"section":"其他","ids":[{"num":"546476069","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g391","tags":[],"pinned":false},{"name":"DM群","aliases":[],"section":"其他","ids":[{"num":"229182542","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g392","tags":[],"pinned":false},{"name":"Gx群","aliases":[],"section":"其他","ids":[{"num":"942823241","note":"疑似似了","dead":false},{"num":"1097756233","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g393","tags":[],"pinned":false},{"name":"5ds群","aliases":[],"section":"其他","ids":[{"num":"749263290","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g394","tags":[],"pinned":false},{"name":"知乎游戏王交流群","aliases":[],"section":"其他","ids":[{"num":"389112843","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g395","tags":[],"pinned":false},{"name":"MC/Pro官方群","aliases":["Pro官方群"],"section":"其他","ids":[{"num":"587425182","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g396","tags":["Pro官方群"],"pinned":false},{"name":"萌卡测试与bug反馈群","aliases":[],"section":"其他","ids":[{"num":"553241437","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g397","tags":[],"pinned":false},{"name":"游戏王ygocore吧群","aliases":[],"section":"其他","ids":[{"num":"780627746","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g398","tags":[],"pinned":false},{"name":"游戏王吧吧群","aliases":[],"section":"其他","ids":[{"num":"626596303","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g399","tags":[],"pinned":false},{"name":"上位卡组吧吧群","aliases":[],"section":"其他","ids":[{"num":"850639154","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g400","tags":[],"pinned":false},{"name":"NGA游戏王群","aliases":[],"section":"其他","ids":[{"num":"144471325","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g401","tags":[],"pinned":false},{"name":"NGA游戏王MD群","aliases":[],"section":"其他","ids":[{"num":"716202717","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g402","tags":[],"pinned":false},{"name":"现场组卡轮抽模式群","aliases":[],"section":"其他","ids":[{"num":"181804674","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g403","tags":[],"pinned":false},{"name":"分级独立卡表群","aliases":[],"section":"其他","ids":[{"num":"684126157","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g404","tags":[],"pinned":false},{"name":"决斗吧官方群","aliases":[],"section":"其他","ids":[{"num":"738177977","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g405","tags":[],"pinned":false},{"name":"编年史群","aliases":[],"section":"其他","ids":[{"num":"608865903","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g406","tags":[],"pinned":false},{"name":"游戏王自走棋交流群","aliases":[],"section":"其他","ids":[{"num":"623209262","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g407","tags":[],"pinned":false},{"name":"萌卡竞技助手反馈交流群","aliases":[],"section":"其他","ids":[{"num":"684446998","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g408","tags":[],"pinned":false},{"name":"村赛交流群","aliases":[],"section":"其他","ids":[{"num":"738030497","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g409","tags":[],"pinned":false},{"name":"FTK研讨群","aliases":[],"section":"其他","ids":[{"num":"668709169","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g410","tags":[],"pinned":false},{"name":"超主流杯群","aliases":[],"section":"其他","ids":[{"num":"658873329","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g411","tags":[],"pinned":false},{"name":"NW论坛游戏王群","aliases":[],"section":"其他","ids":[{"num":"938368361","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g412","tags":[],"pinned":false},{"name":"简中服务器群","aliases":[],"section":"其他","ids":[{"num":"903240040","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g413","tags":[],"pinned":false},{"name":"RD线上决斗群","aliases":[],"section":"其他","ids":[{"num":"1079768857","note":"1群","dead":false},{"num":"658141024","note":"2群","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g414","tags":[],"pinned":false},{"name":"视频打牌群","aliases":[],"section":"其他","ids":[{"num":"118612959","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g415","tags":[],"pinned":false},{"name":"红三奶卡群","aliases":[],"section":"其他","ids":[{"num":"1019137728","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g416","tags":[],"pinned":false},{"name":"错版交流群","aliases":[],"section":"其他","ids":[{"num":"434305068","note":"","dead":false}],"extra":"","missing":false,"nameStruck":false,"id":"g417","tags":[],"pinned":false}]};
+var STORE = "ygoIndexOverlay_v2";
+var ADMIN_KEY = "ygoIndexAdminHash_v1";
+var isAdmin = false;
+var hideDead = false;
+var SECTIONS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["其他"]);
+
+function hashPw(s) {
+  var h = 2166136261;
+  for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(16);
+}
+function loadOverlay() {
+  try { return JSON.parse(localStorage.getItem(STORE) || "null"); } catch (e) { return null; }
+}
+function saveOverlay(o) {
+  try { localStorage.setItem(STORE, JSON.stringify(o)); } catch (e) {}
+}
+function normalizeState(raw) {
+  var s = JSON.parse(JSON.stringify(raw));
+  if (!s.groups) s.groups = [];
+  if (!s.title) s.title = BUILTIN.title;
+  if (s.subtitle == null) s.subtitle = BUILTIN.subtitle;
+  if (s.about == null) s.about = BUILTIN.about;
+  if (!s.feedbackQq) s.feedbackQq = BUILTIN.feedbackQq;
+  if (!s.feedbackAnswer) s.feedbackAnswer = BUILTIN.feedbackAnswer;
+  if (s.footerNote == null) s.footerNote = BUILTIN.footerNote;
+  if (!s.links) s.links = JSON.parse(JSON.stringify(BUILTIN.links));
+  s.groups.forEach(function (g) {
+    if (!g.tags) g.tags = (g.aliases || []).slice();
+    if (g.pinned == null) g.pinned = !!g.featured;
+  });
+  return s;
+}
+function getState() {
+  var o = loadOverlay();
+  return normalizeState(o || BUILTIN);
+}
+function setState(s) { saveOverlay(s); }
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+  });
+}
+function toast(msg) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  setTimeout(function () { t.style.display = "none"; }, 1600);
+}
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function () { toast("已复制 " + text); }, function () { fallbackCopy(text); });
+  } else fallbackCopy(text);
+}
+function fallbackCopy(text) {
+  var a = document.createElement("textarea");
+  a.value = text; document.body.appendChild(a); a.select();
+  try { document.execCommand("copy"); toast("已复制 " + text); } catch (e) { toast("复制失败，请手动选择"); }
+  document.body.removeChild(a);
+}
+
+function isUnavailable(id) {
+  if (!id) return true;
+  if (id.dead) return true;
+  var n = id.note || "";
+  return /炸了|已解散|无法申请|已无活人|似了|死了|没了|搜不到/.test(n);
+}
+function liveIds(g) {
+  return (g.ids || []).filter(function (x) { return !isUnavailable(x); });
+}
+function searchBlob(g) {
+  var parts = [g.name, (g.aliases || []).join(" "), (g.tags || []).join(" "), g.extra || "", g.section || ""];
+  (g.ids || []).forEach(function (x) { parts.push(x.num, x.note || ""); });
+  return parts.join(" ").toLowerCase();
+}
+function matches(g, q) {
+  if (!q) return true;
+  return searchBlob(g).indexOf(q) !== -1;
+}
+
+function renderId(id) {
+  var dead = isUnavailable(id);
+  var cls = "idchip" + (dead ? " dead" : "");
+  var note = id.note ? '<span class="tagnote">（' + esc(id.note) + "）</span>" : "";
+  var copyBtn = dead ? "" : '<button type="button" title="复制" onclick="copyText(\'' + esc(id.num) + "')\">复制</button>";
+  return '<span class="' + cls + '"><span>' + esc(id.num) + "</span>" + note + copyBtn + "</span>";
+}
+
+function renderRow(g) {
+  var allDead = g.ids && g.ids.length && liveIds(g).length === 0 && !g.missing;
+  var extra = g.extra ? '<div class="tagnote">' + esc(g.extra) + "</div>" : "";
+  var idsHtml;
+  if (g.missing) idsHtml = '<span class="tagnote">暂缺</span>';
+  else if (!g.ids || !g.ids.length) idsHtml = '<span class="tagnote">无群号</span>';
+  else idsHtml = '<div class="ids">' + g.ids.map(renderId).join("") + "</div>";
+  var tagsHtml = '<div class="tags-cell">' + (g.tags && g.tags.length ? esc(g.tags.join("，")) : '<span class="tagnote">无标签</span>') + "</div>";
+  var pin = '<label class="pinbox"><input type="checkbox"' + (g.pinned ? " checked" : "") + ' onchange="togglePin(\'' + g.id + '\', this.checked)">置顶</label>';
+  var admin = "";
+  if (isAdmin) {
+    admin = '<div class="actions">' + pin +
+      '<button class="btn" onclick="openEditor(\'' + g.id + "')\">修改</button>" +
+      '<button class="btn btn-danger" onclick="deleteGroup(\'' + g.id + "')\">删除</button></div>";
+  }
+  return '<div class="row' + (allDead ? " all-dead" : "") + '" data-id="' + esc(g.id) + '">' +
+    '<div><div class="name' + (g.nameStruck ? " struck" : "") + '">' + esc(g.name) + "</div>" + extra + "</div>" +
+    "<div>" + idsHtml + "</div>" + tagsHtml + admin + "</div>";
+}
+
+function render() {
+  var s = getState();
+  document.title = s.title || "游戏王群索引";
+  document.getElementById("pageTitle").textContent = s.title || "游戏王群索引";
+  document.getElementById("pageSub").textContent = s.subtitle || "";
+  document.getElementById("lastUpdate").textContent = "最后更新于：" + (s.updated || "");
+  document.getElementById("footerNote").textContent = s.footerNote || "";
+  document.getElementById("linkList").innerHTML = (s.links || []).map(function (L) {
+    return '<li><a href="' + esc(L.url) + '" target="_blank" rel="noopener">' + esc(L.label) + "</a></li>";
+  }).join("");
+
+    var aboutHtml = '<h2>说明</h2><div class="note">' + esc(ensureAboutFeedback(s)) + "</div>";
+  document.getElementById("aboutCard").innerHTML = aboutHtml;
+
+  var q = (document.getElementById("q").value || "").trim().toLowerCase();
+  var groups = s.groups || [];
+  var pinned = groups.filter(function (g) { return g.pinned && matches(g, q); });
+  var featBox = document.getElementById("featuredCard");
+  if (!q && !pinned.length) {
+    featBox.style.display = "";
+    featBox.innerHTML = "<h2>置顶</h2><div class='note'>还没有置顶条目。管理员勾选某一行的「置顶」即可出现在这里。</div>";
+  } else if (!pinned.length) {
+    featBox.style.display = "none";
+    featBox.innerHTML = "";
+  } else {
+    featBox.style.display = "";
+    featBox.innerHTML = "<h2>置顶</h2>" + pinned.map(renderRow).join("");
+  }
+
+  document.getElementById("letters").innerHTML = SECTIONS.map(function (L) {
+    return '<a href="#sec-' + L + '">' + L + "</a>";
+  }).join("");
+
+  var shown = 0;
+  var html = "";
+  SECTIONS.forEach(function (L) {
+    var rows = groups.filter(function (g) { return g.section === L && matches(g, q); });
+    if (!rows.length) return;
+    html += '<div class="sec-h" id="sec-' + L + '">' + L + "</div>";
+    rows.forEach(function (g) { html += renderRow(g); shown++; });
+  });
+  document.getElementById("list").innerHTML = html || '<div class="empty">没有匹配「' + esc(q) + "」的条目。试试别名、标签或群号。</div>";
+  document.getElementById("count").textContent = q ? ("找到 " + shown + " 条") : ("共 " + groups.length + " 条卡组群");
+  document.body.classList.toggle("admin", isAdmin);
+  document.body.classList.toggle("hide-dead", hideDead);
+  document.getElementById("adminBtn").textContent = isAdmin ? "管理中" : "管理员";
+}
+
+function toggleDead() { hideDead = !hideDead; render(); }
+
+function openModal(inner) {
+  document.getElementById("modal").innerHTML = inner;
+  document.getElementById("modalBg").style.display = "flex";
+}
+function closeModal() { document.getElementById("modalBg").style.display = "none"; }
+
+function openAdmin() {
+  if (isAdmin) { toast("已在管理模式"); return; }
+  var stored = null;
+  try { stored = localStorage.getItem(ADMIN_KEY); } catch (e) {}
+  openModal(
+    "<h3>管理员</h3>" +
+    '<p class="note">' + (stored ? "请输入你之前设定的密码。" : "第一次使用：输入一个密码。密码只存在这台设备的浏览器里。") + "</p>" +
+    '<div class="form-row"><label>密码</label><input id="pw" type="password"></div>' +
+    '<div class="toolbar"><button class="btn btn-gold" onclick="doLogin()">确定</button><button class="btn" onclick="closeModal()">取消</button></div>'
+  );
+  setTimeout(function () { var el = document.getElementById("pw"); if (el) el.focus(); }, 50);
+}
+function doLogin() {
+  var pw = document.getElementById("pw").value || "";
+  if (!pw) { toast("请输入密码"); return; }
+  var h = hashPw(pw);
+  var stored = null;
+  try { stored = localStorage.getItem(ADMIN_KEY); } catch (e) {}
+  if (!stored) {
+    try { localStorage.setItem(ADMIN_KEY, h); } catch (e) {}
+    isAdmin = true; closeModal(); render(); toast("已设定管理员密码");
+    return;
+  }
+  if (stored === h) { isAdmin = true; closeModal(); render(); toast("已进入管理"); }
+  else toast("密码不对");
+}
+function logoutAdmin() { isAdmin = false; render(); }
+
+function findGroup(id) {
+  var s = getState();
+  for (var i = 0; i < s.groups.length; i++) {
+    if (s.groups[i].id === id) return { s: s, g: s.groups[i], idx: i };
+  }
+  return null;
+}
+
+function togglePin(id, on) {
+  var f = findGroup(id);
+  if (!f) return;
+  f.g.pinned = !!on;
+  f.s.updated = today();
+  setState(f.s);
+  render();
+}
+
+function openSubmit() {
+  var s = getState();
+  openModal(
+    "<h3>提交新群</h3>" +
+    '<p class="note">任何人都可以填。提交后请把生成的文本发到反馈群 <b>' + esc(s.feedbackQq || "746902919") +
+    "</b>，进群答案：<b>" + esc(s.feedbackAnswer || "形而上学枫叶") +
+    "</b>。管理员审核通过后才会写进索引。</p>" +
+    '<div class="form-row"><label>群名 *</label><input id="sName" placeholder="例如：废品二重身"></div>' +
+    '<div class="form-row"><label>别名 / 大家口头叫法（选填，逗号分隔）</label><input id="sTags" placeholder="例如：废二"></div>' +
+    '<div class="form-row"><label>群号 *（多个用顿号或换行）</label><textarea id="sIds" rows="3" placeholder="427968149"></textarea></div>' +
+    '<div class="form-row"><label>备注（选填）</label><input id="sExtra" placeholder="例如：新群 / 备用群"></div>' +
+    '<div class="toolbar">' +
+      '<button class="btn btn-gold" onclick="prepareSubmit()">生成并复制提交文本</button>' +
+      '<button class="btn" onclick="closeModal()">取消</button>' +
+    "</div>" +
+    '<p class="note" id="sResult" style="margin-top:10px;display:none;white-space:pre-wrap"></p>'
+  );
+}
+function prepareSubmit() {
+  var s = getState();
+  var name = (document.getElementById("sName").value || "").trim();
+  var ids = (document.getElementById("sIds").value || "").trim();
+  var tags = (document.getElementById("sTags").value || "").trim();
+  var extra = (document.getElementById("sExtra").value || "").trim();
+  if (!name || !ids) { toast("请至少填写群名和群号"); return; }
+  var msg = [
+    "【游戏王群索引-新群提交】",
+    "群名：" + name,
+    "群号：" + ids.replace(/\n+/g, "、"),
+    tags ? ("别名：" + tags) : "",
+    extra ? ("备注：" + extra) : "",
+    "请管理员审核后加入索引。"
+  ].filter(Boolean).join("\n");
+  var box = document.getElementById("sResult");
+  box.style.display = "block";
+  box.textContent = "已复制下面这段，请发到反馈群 " + (s.feedbackQq || "") + "：\n\n" + msg;
+  copyText(msg);
+}
+
+function openEditor(id) {
+  var g = {
+    id: "g" + Date.now(),
+    name: "", aliases: [], tags: [], section: "其他",
+    ids: [{ num: "", note: "", dead: false }],
+    extra: "", missing: false, nameStruck: false, pinned: false
+  };
+  if (id) {
+    var f = findGroup(id);
+    if (!f) return;
+    g = JSON.parse(JSON.stringify(f.g));
+  }
+  var idLines = (g.ids && g.ids.length ? g.ids : [{ num: "", note: "", dead: false }]).map(function (x) {
+    return (x.num || "") + (x.note ? "（" + x.note + "）" : "") + (isUnavailable(x) ? " [失效]" : "");
+  }).join("\n");
+  var secOpts = SECTIONS.map(function (L) {
+    return '<option value="' + L + '"' + (g.section === L ? " selected" : "") + ">" + L + "</option>";
+  }).join("");
+  openModal(
+    "<h3>" + (id ? "修改条目" : "新增条目") + "</h3>" +
+    '<div class="form-row"><label>群名</label><input id="eName" value="' + esc(g.name) + '"></div>' +
+    '<div class="form-row"><label>隐藏标签（逗号分隔，普通用户看不到，搜索能匹配）</label><input id="eTags" value="' + esc((g.tags || []).join("，")) + '"></div>' +
+    '<div class="form-row"><label>分区</label><select id="eSec">' + secOpts + "</select></div>" +
+    '<div class="form-row"><label>群号（一行一个）。格式：123456789 或 123456789（新群） 或 123456789 [失效]</label><textarea id="eIds" rows="5">' + esc(idLines) + "</textarea></div>" +
+    '<div class="form-row"><label>备注</label><input id="eExtra" value="' + esc(g.extra || "") + '"></div>' +
+    '<div class="form-row"><label><input type="checkbox" id="eMissing"' + (g.missing ? " checked" : "") + "> 暂缺群号</label></div>" +
+    '<div class="form-row"><label><input type="checkbox" id="ePinned"' + (g.pinned ? " checked" : "") + "> 置顶</label></div>" +
+    '<div class="toolbar"><button class="btn btn-gold" onclick="saveEditor(\'' + esc(g.id) + "', " + (id ? "true" : "false") + ')">保存</button><button class="btn" onclick="closeModal()">取消</button></div>'
+  );
+}
+
+function parseIdLines(text) {
+  var out = [];
+  String(text || "").split(/\n+/).forEach(function (line) {
+    line = line.trim();
+    if (!line) return;
+    var dead = /\[失效\]|\[死\]|\[炸\]/.test(line);
+    line = line.replace(/\s*\[(失效|死|炸)\]\s*/g, "");
+    var m = line.match(/^(\d{5,12})\s*(?:（([^）]*)）|\(([^)]*)\))?/);
+    if (m) {
+      var note = (m[2] || m[3] || "").trim();
+      out.push({ num: m[1], note: note, dead: dead || /炸了|已解散|无法申请|已无活人/.test(note) });
+    }
+  });
+  return out;
+}
+
+function today() {
+  var d = new Date();
+  var dd = ("0" + d.getDate()).slice(-2);
+  var mm = ("0" + (d.getMonth() + 1)).slice(-2);
+  return dd + "/" + mm + "/" + d.getFullYear();
+}
+
+function saveEditor(id, exists) {
+  var name = document.getElementById("eName").value.trim();
+  if (!name) { toast("请填写群名"); return; }
+  var tags = document.getElementById("eTags").value.split(/[，,]/).map(function (x) { return x.trim(); }).filter(Boolean);
+  var g = {
+    id: id,
+    name: name,
+    aliases: tags.slice(),
+    tags: tags,
+    section: document.getElementById("eSec").value,
+    ids: parseIdLines(document.getElementById("eIds").value),
+    extra: document.getElementById("eExtra").value.trim(),
+    missing: document.getElementById("eMissing").checked,
+    pinned: document.getElementById("ePinned").checked,
+    nameStruck: false,
+    addedAt: Date.now()
+  };
+  var s = getState();
+  if (exists) {
+    var found = false;
+    for (var i = 0; i < s.groups.length; i++) {
+      if (s.groups[i].id === id) { s.groups[i] = g; found = true; break; }
+    }
+    if (!found) s.groups.push(g);
+  } else s.groups.push(g);
+  s.updated = today();
+  setState(s);
+  closeModal();
+  render();
+  toast("已保存（仅这台设备）");
+}
+
+function deleteGroup(id) {
+  var s = getState();
+  s.groups = s.groups.filter(function (g) { return g.id !== id; });
+  s.updated = today();
+  setState(s);
+  render();
+  toast("已删除（仅这台设备）");
+}
+
+function openMetaEditor() {
+  var s = getState();
+  var linkText = (s.links || []).map(function (L) { return L.label + " | " + L.url; }).join("\n");
+  openModal(
+    "<h3>编辑页头 / 说明 / 连接</h3>" +
+    '<div class="form-row"><label>标题</label><input id="mTitle" value="' + esc(s.title) + '"></div>' +
+    '<div class="form-row"><label>标题下的一句说明</label><textarea id="mSub" rows="3">' + esc(s.subtitle) + "</textarea></div>" +
+    '<div class="form-row"><label>说明正文</label><textarea id="mAbout" rows="8">' + esc(s.about) + "</textarea></div>" +
+    '<div class="form-row"><label>反馈群号</label><input id="mQq" value="' + esc(s.feedbackQq) + '"></div>' +
+    '<div class="form-row"><label>进群答案</label><input id="mAns" value="' + esc(s.feedbackAnswer) + '"></div>' +
+    '<div class="form-row"><label>页脚备注</label><textarea id="mFoot" rows="3">' + esc(s.footerNote) + "</textarea></div>" +
+    '<div class="form-row"><label>实用连接（一行一个：名称 | 网址）</label><textarea id="mLinks" rows="6">' + esc(linkText) + "</textarea></div>" +
+    '<div class="toolbar"><button class="btn btn-gold" onclick="saveMeta()">保存</button><button class="btn" onclick="closeModal()">取消</button></div>'
+  );
+}
+function saveMeta() {
+  var s = getState();
+  s.title = document.getElementById("mTitle").value.trim() || s.title;
+  s.subtitle = document.getElementById("mSub").value;
+  s.about = document.getElementById("mAbout").value;
+  s.feedbackQq = document.getElementById("mQq").value.trim();
+  s.feedbackAnswer = document.getElementById("mAns").value.trim();
+  s.footerNote = document.getElementById("mFoot").value;
+  s.links = document.getElementById("mLinks").value.split(/\n+/).map(function (line) {
+    line = line.trim();
+    if (!line) return null;
+    var parts = line.split("|");
+    if (parts.length < 2) return null;
+    return { label: parts[0].trim(), url: parts.slice(1).join("|").trim() };
+  }).filter(Boolean);
+  s.updated = today();
+  setState(s);
+  closeModal();
+  render();
+  toast("说明已更新（仅这台设备）");
+}
+
+function ensureAboutFeedback(s) {
+  var about = s.about || "";
+  var qq = s.feedbackQq || "";
+  var ans = s.feedbackAnswer || "";
+  if (qq && about.indexOf(qq) === -1) {
+    about = about.replace(/\s+$/, "");
+    about += "\n\n如果遇到群号搜不到等情况，多半是群炸了，或者你有新的群号想加入此索引，请加入：" + qq + " 反馈给我，谢谢大家。";
+    if (ans) about += "群问题答案：" + ans + "。";
+  }
+  return about;
+}
+
+function formatIdsTxt(g) {
+  if (g.missing) return "暂缺";
+  return (g.ids || []).map(function (x) {
+    var core = isUnavailable(x) ? "~~" + x.num + "~~" : x.num;
+    return core + (x.note ? "（" + x.note + "）" : "");
+  }).join("、");
+}
+function formatLine(g) {
+  return g.name + "：" + formatIdsTxt(g) + (g.extra ? " " + g.extra : "");
+}
+
+function buildPlainDocument(s) {
+  var lines = [];
+  lines.push(s.title || "游戏王群索引");
+  lines.push("");
+  if (s.subtitle) {
+    lines.push("（" + String(s.subtitle).replace(/^（|）$/g, "") + "）");
+    lines.push("");
+  }
+  lines.push("*最后更新于：" + (s.updated || ""));
+  var pinned = (s.groups || []).filter(function (g) { return g.pinned; });
+  pinned.forEach(function (g) {
+    lines.push("**" + formatLine(g));
+  });
+  lines.push("");
+  lines.push("说明：");
+  lines.push("");
+  lines.push(ensureAboutFeedback(s));
+  lines.push("");
+  SECTIONS.forEach(function (L) {
+    var rows = s.groups.filter(function (g) { return g.section === L; });
+    if (!rows.length) return;
+    lines.push(L === "其他" ? "其他：" : L);
+    rows.forEach(function (g) { lines.push(formatLine(g)); });
+    lines.push("");
+  });
+  lines.push("实用连接：");
+  (s.links || []).forEach(function (L) {
+    lines.push((L.label || "") + "：" + (L.url || ""));
+  });
+  return lines.join("\n");
+}
+
+function formatIdsHtml(g) {
+  if (g.missing) return "暂缺";
+  return (g.ids || []).map(function (x) {
+    var num = esc(x.num);
+    if (isUnavailable(x)) num = '<span style="text-decoration:line-through">' + num + "</span>";
+    return num + (x.note ? "（" + esc(x.note) + "）" : "");
+  }).join("、");
+}
+
+function buildWordHtml(s) {
+  var h = [];
+  h.push('<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">');
+  h.push("<head><meta charset='utf-8'><title>" + esc(s.title || "游戏王群索引") + "</title>");
+  h.push("<style>body{font-family:'Microsoft YaHei','PingFang SC',SimSun,sans-serif;font-size:12pt;line-height:1.6}");
+  h.push("h1{font-size:18pt;margin:0 0 8pt} h2{font-size:14pt;margin:14pt 0 6pt}");
+  h.push(".muted{color:#555} .sec{font-size:14pt;font-weight:700;margin:12pt 0 4pt}");
+  h.push("p{margin:0 0 4pt}</style></head><body>");
+  h.push("<h1>" + esc(s.title || "游戏王群索引") + "</h1>");
+  if (s.subtitle) h.push("<p class='muted'>（" + esc(String(s.subtitle).replace(/^（|）$/g, "")) + "）</p>");
+  h.push("<p><b>*最后更新于：" + esc(s.updated || "") + "</b></p>");
+  (s.groups || []).filter(function (g) { return g.pinned; }).forEach(function (g) {
+    h.push("<p><b>**" + esc(g.name) + "：</b>" + formatIdsHtml(g) + (g.extra ? " " + esc(g.extra) : "") + "</p>");
+  });
+  h.push("<h2>说明：</h2>");
+  esc(ensureAboutFeedback(s)).split(/\n/).forEach(function (line) {
+    h.push("<p>" + (line ? line : "&nbsp;") + "</p>");
+  });
+  SECTIONS.forEach(function (L) {
+    var rows = s.groups.filter(function (g) { return g.section === L; });
+    if (!rows.length) return;
+    h.push("<p class='sec'>" + (L === "其他" ? "其他：" : L) + "</p>");
+    rows.forEach(function (g) {
+      var name = g.nameStruck ? '<span style="text-decoration:line-through">' + esc(g.name) + "</span>" : esc(g.name);
+      h.push("<p>" + name + "：" + formatIdsHtml(g) + (g.extra ? " " + esc(g.extra) : "") + "</p>");
+    });
+  });
+  h.push("<h2>实用连接：</h2>");
+  (s.links || []).forEach(function (L) {
+    h.push("<p>" + esc(L.label || "") + "：<a href='" + esc(L.url || "") + "'>" + esc(L.url || "") + "</a></p>");
+  });
+  h.push("</body></html>");
+  return h.join("");
+}
+
+function downloadBlob(content, filename, mime) {
+  var blob = new Blob([content], { type: mime });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+}
+
+function toggleExportMenu(ev) {
+  if (ev) ev.stopPropagation();
+  var box = document.getElementById("exportDrop");
+  box.classList.toggle("open");
+}
+document.addEventListener("click", function () {
+  var box = document.getElementById("exportDrop");
+  if (box) box.classList.remove("open");
+});
+
+function shareText() {
+  copyText(buildPlainDocument(getState()));
+}
+function exportTxt() {
+  var s = getState();
+  downloadBlob(buildPlainDocument(s), "游戏王群索引.txt", "text/plain;charset=utf-8");
+  var box = document.getElementById("exportDrop");
+  if (box) box.classList.remove("open");
+  toast("已导出记事本文件");
+}
+function exportWord() {
+  var s = getState();
+  downloadBlob("\ufeff" + buildWordHtml(s), "游戏王群索引.doc", "application/msword");
+  var box = document.getElementById("exportDrop");
+  if (box) box.classList.remove("open");
+  toast("已导出 Word 文件，用 Word / WPS 打开即可");
+}
+function exportJSON() {
+  var s = getState();
+  downloadBlob(JSON.stringify(s, null, 2), "ygo-group-index.json", "application/json");
+  var box = document.getElementById("exportDrop");
+  if (box) box.classList.remove("open");
+  toast("已下载 JSON");
+}
+
+render();
+</script>
+</body>
+</html>
