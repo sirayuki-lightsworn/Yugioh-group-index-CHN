@@ -63,16 +63,59 @@ body.admin .pinbox{display:inline-flex}
 .hide-dead .idchip.dead,.hide-dead .row.all-dead{display:none}
 .pending-card{border-color:#5a4030}
 .badge{display:inline-block;background:#3a3018;color:var(--gold2);border-radius:999px;padding:1px 8px;font-size:12px;margin-left:6px}
+
+html[data-theme="light"]{
+  --bg:#f3efe6; --bg2:#fffaf1; --card:#ffffff; --line:#e2d6c2;
+  --text:#2b261c; --muted:#6f6658; --gold:#9a7418; --gold2:#6e5210;
+  --blue:#2b6bcf; --danger:#c44545; --ok:#2f7d55; --dead:#8a8378;
+}
+html[data-theme="light"] header.hero{
+  background:linear-gradient(160deg,#fff6e4 0%,#f7f0e3 60%,#f3efe6 100%);
+}
+html[data-theme="light"] .search-card{
+  background:linear-gradient(180deg,#fff6e4,#fff);
+  border-color:#c9a24a;
+}
+html[data-theme="light"] .search-card input{background:#fff;border-color:#dcc48a;color:var(--text)}
+html[data-theme="light"] .letters{background:rgba(243,239,230,.94)}
+html[data-theme="light"] .featured{background:linear-gradient(180deg,#fff6e4,#fff)}
+.title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.title-row h1{margin:0}
+.icon-btn{
+  width:34px;height:34px;border-radius:10px;border:1px solid var(--line);
+  background:var(--card);color:var(--text);cursor:pointer;font-size:16px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold2)}
+.btn-add{background:#1f6b3a;border-color:#2f8a4e;color:#eafff1;font-weight:700}
+.btn-add:hover{border-color:#7dcea0;color:#fff}
+.pencil{display:none;border:0;background:transparent;color:var(--gold);cursor:pointer;font-size:13px;padding:0 4px}
+body.admin .pencil{display:inline}
+#queueBtn{display:none}
+body.admin.show-queue #queueBtn{display:inline-flex}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="hero">
-    <h1 id="pageTitle">游戏王群索引</h1>
+    <div class="title-row">
+      <h1 id="pageTitle">游戏王群索引</h1>
+      <button class="pencil" title="编辑标题" onclick="openFieldEditor('title')">✎</button>
+      <button class="icon-btn" id="themeBtn" title="白天/夜间" onclick="toggleTheme()">🌙</button>
+      <button class="icon-btn" id="adminBtn" title="管理员" onclick="openAdmin()">⚙</button>
+    </div>
     <div class="sub" id="pageSub"></div>
+    <button class="pencil" title="编辑副标题" onclick="openFieldEditor('subtitle')">✎ 编辑这句说明</button>
     <div class="updated" id="lastUpdate"></div>
     <div class="toolbar">
-      <button class="btn btn-gold" onclick="openSubmit()">提交新群</button>
+      <div class="drop" id="submitDrop">
+        <button class="btn btn-add" onclick="toggleSubmitMenu(event)">+ 投稿</button>
+        <div class="drop-menu">
+          <button type="button" onclick="openSubmit('group')">更新群信息</button>
+          <button type="button" onclick="openSubmit('feedback')">意见 / 新功能</button>
+        </div>
+      </div>
       <div class="drop" id="exportDrop">
         <button class="btn" onclick="toggleExportMenu(event)">导出 ▾</button>
         <div class="drop-menu">
@@ -83,11 +126,10 @@ body.admin .pinbox{display:inline-flex}
       </div>
       <button class="btn" onclick="shareText()">复制为文本</button>
       <button class="btn" onclick="toggleDead()">隐藏/显示已失效群号</button>
-      <button class="btn" id="adminBtn" onclick="openAdmin()">管理员</button>
-      <button class="btn admin-only" onclick="openQueue()">审核队列<span class="badge" id="pendBadge"></span></button>
+      <button class="btn admin-only" id="queueBtn" onclick="openQueue()">审核队列<span class="badge" id="pendBadge"></span></button>
       <button class="btn btn-gold admin-only" onclick="openEditor(null)">直接新增</button>
-      <button class="btn admin-only" onclick="openMetaEditor()">编辑说明/页头</button>
       <button class="btn admin-only" onclick="openSiteSettings()">发布设置</button>
+      <button class="btn admin-only" onclick="openPassword()">修改密码</button>
       <button class="btn admin-only" onclick="publishToGitHub()">发布到网站</button>
       <button class="btn admin-only" onclick="logoutAdmin()">退出管理</button>
     </div>
@@ -103,9 +145,10 @@ body.admin .pinbox{display:inline-flex}
   <div class="hint"><span class="count" id="count"></span> · 失效群号不提供复制</div>
   <div id="list"></div>
   <footer>
-    <h2 style="color:var(--gold2);font-size:16px;">实用连接</h2>
+    <h2 style="color:var(--gold2);font-size:16px;">实用连接 <button class="pencil" onclick="openFieldEditor('links')">✎</button></h2>
     <ul id="linkList"></ul>
     <p class="note" id="footerNote"></p>
+    <button class="pencil" onclick="openFieldEditor('footerNote')">✎ 编辑页脚</button>
   </footer>
 </div>
 <div class="toast" id="toast"></div>
@@ -115,6 +158,20 @@ var SECTIONS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["其他"]);
 var ADMIN_KEY = "ygoOfficialAdminHash_v1";
 var TOKEN_KEY = "ygoOfficialPublishToken_v1";
 var isAdmin = false, hideDead = false, DATA = null, DIRTY = false;
+var THEME_KEY="ygoOfficialTheme_v1";
+function applyTheme(th){
+  document.documentElement.setAttribute("data-theme", th==="light"?"light":"dark");
+  var b=document.getElementById("themeBtn");
+  if(b) b.textContent = th==="light" ? "☀" : "🌙";
+}
+function toggleTheme(){
+  var cur=document.documentElement.getAttribute("data-theme")==="light"?"light":"dark";
+  var next=cur==="light"?"dark":"light";
+  localStorage.setItem(THEME_KEY,next);
+  applyTheme(next);
+}
+applyTheme(localStorage.getItem(THEME_KEY)||"dark");
+
 
 function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none"},1800)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
@@ -176,7 +233,7 @@ function render(){
   document.getElementById("lastUpdate").textContent="最后更新于："+(DATA.updated||"")+(DIRTY?"（有未发布的本地修改）":"");
   document.getElementById("footerNote").textContent=DATA.footerNote||"";
   document.getElementById("linkList").innerHTML=(DATA.links||[]).map(function(L){return "<li><a href='"+esc(L.url)+"' target='_blank' rel='noopener'>"+esc(L.label)+"</a></li>"}).join("");
-  document.getElementById("aboutCard").innerHTML="<h2>说明</h2><div class='note'>"+esc(ensureAboutFeedback(DATA))+"</div>";
+  document.getElementById("aboutCard").innerHTML="<h2>说明 <button class='pencil' onclick=\"openFieldEditor('about')\">✎</button></h2><div class='note'>"+esc(ensureAboutFeedback(DATA))+"</div>";
   var q=(document.getElementById("q").value||"").trim().toLowerCase();
   var pinned=DATA.groups.filter(function(g){return g.pinned&&matches(g,q)});
   var feat=document.getElementById("featuredCard");
@@ -194,17 +251,20 @@ function render(){
   document.getElementById("count").textContent=q?("找到 "+shown+" 条"):("共 "+DATA.groups.length+" 条");
   document.body.classList.toggle("admin",isAdmin);
   document.body.classList.toggle("hide-dead",hideDead);
-  document.getElementById("adminBtn").textContent=isAdmin?"管理中":"管理员";
+  var ab=document.getElementById("adminBtn");
+  if(ab){ab.title=isAdmin?"管理中，点击可改密码入口在工具栏":"管理员";ab.textContent="⚙"}
+  document.body.classList.toggle("show-queue", isAdmin && storeReady());
   var pb=document.getElementById("pendBadge");
-  var n=(DATA.pending||[]).length;
-  pb.textContent=n?(" "+n):"";
+  if(pb){var n=(DATA.pending||[]).length;pb.textContent=n?(" "+n):""}
 }
+
 
 function toggleDead(){hideDead=!hideDead;render()}
 function openModal(html){document.getElementById("modal").innerHTML=html;document.getElementById("modalBg").style.display="flex"}
 function closeModal(){document.getElementById("modalBg").style.display="none"}
-function toggleExportMenu(ev){if(ev)ev.stopPropagation();document.getElementById("exportDrop").classList.toggle("open")}
-document.addEventListener("click",function(){var b=document.getElementById("exportDrop");if(b)b.classList.remove("open")});
+function toggleExportMenu(ev){if(ev)ev.stopPropagation();document.getElementById("exportDrop").classList.toggle("open");var s=document.getElementById("submitDrop");if(s)s.classList.remove("open")}
+function toggleSubmitMenu(ev){if(ev)ev.stopPropagation();document.getElementById("submitDrop").classList.toggle("open");var e=document.getElementById("exportDrop");if(e)e.classList.remove("open")}
+document.addEventListener("click",function(){["exportDrop","submitDrop"].forEach(function(id){var b=document.getElementById(id);if(b)b.classList.remove("open")})});
 
 function openAdmin(){
   if(isAdmin){toast("已在管理");return}
@@ -239,62 +299,46 @@ function parseIdLines(text){
   });return out;
 }
 
-function openSubmit(){
-  var gh=DATA.github||{};
-  openModal("<h3>提交新群</h3><p class='note'>填写后点提交。管理员审核通过才会出现在公开索引里。</p>"+
-    "<div class='form-row'><label>群名 *</label><input id='sName'></div>"+
-    "<div class='form-row'><label>群号 *（多个用顿号或换行）</label><textarea id='sIds' rows='3'></textarea></div>"+
-    "<div class='form-row'><label>别名 / 口头叫法</label><input id='sTags' placeholder='废二'></div>"+
-    "<div class='form-row'><label>分区（可先不选）</label><select id='sSec'><option value=''>待管理员指定</option>"+SECTIONS.map(function(L){return "<option value='"+L+"'>"+L+"</option>"}).join("")+"</select></div>"+
-    "<div class='form-row'><label>备注</label><input id='sExtra'></div>"+
-    "<div class='toolbar'><button class='btn btn-gold' onclick='doSubmit()'>提交审核</button><button class='btn' onclick='closeModal()'>取消</button></div>"+
+function openSubmit(kind){
+  kind = kind || "group";
+  var s=document.getElementById("submitDrop"); if(s) s.classList.remove("open");
+  var title = kind==="feedback" ? "意见 / 新功能" : "更新群信息";
+  var hint = kind==="feedback"
+    ? "写你想说的即可：建议、新功能、页面问题都可以。想收到回复请留下 QQ 或邮箱。"
+    : "随便写。可以是新群号、老群炸了要换、改名、补充别名，或其他和群索引有关的情况。想知道有没有被收录，请留下 QQ 或邮箱。";
+  openModal("<h3>"+title+"</h3><p class='note'>"+hint+"</p>"+
+    "<input type='hidden' id='sKind' value='"+kind+"'>"+
+    "<div class='form-row'><label>内容 *</label><textarea id='sBody' rows='8' placeholder='直接把要说的写在这里'></textarea></div>"+
+    "<div class='form-row'><label>联系方式（选填，QQ / 邮箱 / 其他）</label><input id='sContact' placeholder='方便通知你审核结果'></div>"+
+    "<div class='toolbar'><button class='btn btn-add' onclick='doSubmit()'>+ 提交</button><button class='btn' onclick='closeModal()'>取消</button></div>"+
     "<p class='note' id='sMsg' style='margin-top:10px'></p>");
 }
-
-function storeCfg(){
-  return DATA.store || {};
-}
-function lcHeaders(){
-  var s=storeCfg();
-  return {"X-LC-Id":s.appId,"X-LC-Key":s.appKey,"Content-Type":"application/json"};
-}
-function lcUrl(path){
-  var s=storeCfg();
-  var base=(s.server||"").replace(/\/$/,"");
-  return base+"/1.1"+path;
-}
-function storeReady(){
-  var s=storeCfg();
-  return !!(s.appId && s.appKey && s.server);
-}
-
 async function doSubmit(){
-  var name=(document.getElementById("sName").value||"").trim();
-  var ids=(document.getElementById("sIds").value||"").trim();
-  var tags=(document.getElementById("sTags").value||"").trim();
-  var extra=(document.getElementById("sExtra").value||"").trim();
-  var section=document.getElementById("sSec").value;
-  if(!name||!ids){toast("请填写群名和群号");return}
+  var kind=(document.getElementById("sKind").value||"group");
+  var body=(document.getElementById("sBody").value||"").trim();
+  var contact=(document.getElementById("sContact").value||"").trim();
+  if(!body){toast("请填写内容");return}
   var msg=document.getElementById("sMsg");
   msg.textContent="正在提交…";
   var email=(DATA.notifyEmail||"").trim();
+  var subject = (kind==="feedback"?"【游戏王群索引】意见建议":"【游戏王群索引】群信息更新");
   if(email){
     try{
       var res=await fetch("https://formsubmit.co/ajax/"+encodeURIComponent(email),{
         method:"POST",
         headers:{"Content-Type":"application/json","Accept":"application/json"},
         body:JSON.stringify({
-          _subject:"【游戏王群索引】新群提交："+name,
-          群名:name,
-          群号:ids,
-          标签:tags||"（无）",
-          分区:section||"（待定）",
-          备注:extra||"（无）"
+          _subject:subject,
+          类型: kind==="feedback"?"意见/新功能":"群信息",
+          内容:body,
+          联系方式:contact||"（未留，无法单独通知）"
         })
       });
       var data=await res.json();
       if(res.ok){
-        msg.textContent="已提交到管理员邮箱。若这是第一次，管理员需要先点确认信。";
+        msg.textContent=contact
+          ? "已提交。你留下了联系方式，审核后管理员可以联系你。"
+          : "已提交。若想收到「已收录」或感谢，下次可留下 QQ / 邮箱。";
         toast("已发送");
         return;
       }
@@ -302,21 +346,22 @@ async function doSubmit(){
     }catch(e){msg.textContent="邮箱通道暂时连不上。"}
     return;
   }
-  if(storeReady()){
+  if(typeof storeReady==="function" && storeReady()){
     try{
       var res2=await fetch(lcUrl("/classes/Pending"),{
         method:"POST", headers:lcHeaders(),
-        body:JSON.stringify({name:name,ids:ids,tags:tags,extra:extra,section:section,status:"pending"})
+        body:JSON.stringify({kind:kind,body:body,contact:contact,status:"pending",name:body.slice(0,20)})
       });
       var data2=await res2.json();
-      if(res2.ok && data2.objectId){msg.textContent="已提交到后台审核队列。";toast("提交成功");return}
+      if(res2.ok && data2.objectId){msg.textContent="已提交到后台。";toast("提交成功");return}
       msg.textContent="提交失败："+(data2.error||res2.status);
     }catch(e){msg.textContent="网络失败。"}
     return;
   }
-  msg.textContent="管理员还没有填写接收邮箱。请先复制下面内容发给管理员。";
-  copyText("【游戏王群索引-新群提交】\n群名："+name+"\n群号："+ids+"\n标签："+tags+"\n备注："+extra);
+  msg.textContent="管理员还没有填写接收邮箱。已为你复制内容。";
+  copyText(subject+"\n"+body+"\n联系方式："+(contact||"无"));
 }
+
 
 
 
@@ -340,6 +385,44 @@ function saveEditor(id,exists){
   if(exists){var found=false;for(var i=0;i<DATA.groups.length;i++) if(DATA.groups[i].id===id){DATA.groups[i]=g;found=true;break} if(!found) DATA.groups.push(g)}
   else DATA.groups.push(g);
   DATA.updated=today();markDirty();closeModal();render();toast("已保存到本机，请点「发布到网站」");
+}
+
+
+function openFieldEditor(field){
+  var label={title:"标题",subtitle:"标题下说明",about:"说明正文",footerNote:"页脚",links:"实用连接"}[field]||field;
+  var val="";
+  if(field==="links") val=(DATA.links||[]).map(function(L){return L.label+" | "+L.url}).join("\n");
+  else val=DATA[field]==null?"":DATA[field];
+  openModal("<h3>编辑"+label+"</h3>"+
+    "<div class='form-row'><textarea id='fVal' rows='8'>"+esc(val)+"</textarea></div>"+
+    (field==="links"?"<p class='note'>一行一个：名称 | 网址</p>":"")+
+    "<div class='toolbar'><button class='btn btn-gold' onclick='saveFieldEditor(\""+field+"\")'>保存</button><button class='btn' onclick='closeModal()'>取消</button></div>");
+}
+function saveFieldEditor(field){
+  var val=document.getElementById("fVal").value;
+  if(field==="links"){
+    DATA.links=val.split(/\n+/).map(function(line){var p=line.split("|");if(p.length<2)return null;return {label:p[0].trim(),url:p.slice(1).join("|").trim()}}).filter(Boolean);
+  } else {
+    DATA[field]=val;
+  }
+  DATA.updated=today();markDirty();closeModal();render();toast("已保存，请发布到网站");
+}
+function openPassword(){
+  openModal("<h3>修改管理员密码</h3>"+
+    "<div class='form-row'><label>当前密码</label><input id='pOld' type='password'></div>"+
+    "<div class='form-row'><label>新密码</label><input id='pNew' type='password'></div>"+
+    "<div class='form-row'><label>再输入一次</label><input id='pNew2' type='password'></div>"+
+    "<div class='toolbar'><button class='btn btn-gold' onclick='savePassword()'>更新密码</button><button class='btn' onclick='closeModal()'>取消</button></div>");
+}
+function savePassword(){
+  var stored=localStorage.getItem(ADMIN_KEY)||"";
+  var old=document.getElementById("pOld").value||"";
+  var a=document.getElementById("pNew").value||"";
+  var b=document.getElementById("pNew2").value||"";
+  if(hashPw(old)!==stored){toast("当前密码不对");return}
+  if(!a||a!==b){toast("两次新密码不一致");return}
+  localStorage.setItem(ADMIN_KEY,hashPw(a));
+  closeModal();toast("密码已更新（仅这台浏览器）");
 }
 
 function openMetaEditor(){
