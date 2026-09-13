@@ -250,6 +250,24 @@ function openSubmit(){
     "<div class='toolbar'><button class='btn btn-gold' onclick='doSubmit()'>提交审核</button><button class='btn' onclick='closeModal()'>取消</button></div>"+
     "<p class='note' id='sMsg' style='margin-top:10px'></p>");
 }
+
+function storeCfg(){
+  return DATA.store || {};
+}
+function lcHeaders(){
+  var s=storeCfg();
+  return {"X-LC-Id":s.appId,"X-LC-Key":s.appKey,"Content-Type":"application/json"};
+}
+function lcUrl(path){
+  var s=storeCfg();
+  var base=(s.server||"").replace(/\/$/,"");
+  return base+"/1.1"+path;
+}
+function storeReady(){
+  var s=storeCfg();
+  return !!(s.appId && s.appKey && s.server);
+}
+
 async function doSubmit(){
   var name=(document.getElementById("sName").value||"").trim();
   var ids=(document.getElementById("sIds").value||"").trim();
@@ -257,11 +275,9 @@ async function doSubmit(){
   var extra=(document.getElementById("sExtra").value||"").trim();
   var section=document.getElementById("sSec").value;
   if(!name||!ids){toast("请填写群名和群号");return}
-  var payload={name:name,ids:ids,tags:tags,extra:extra,section:section,source:"ygo-index"};
   var msg=document.getElementById("sMsg");
   msg.textContent="正在提交…";
   var email=(DATA.notifyEmail||"").trim();
-  var proxy=(DATA.github&&DATA.github.submitProxy)||"";
   if(email){
     try{
       var res=await fetch("https://formsubmit.co/ajax/"+encodeURIComponent(email),{
@@ -273,32 +289,36 @@ async function doSubmit(){
           群号:ids,
           标签:tags||"（无）",
           分区:section||"（待定）",
-          备注:extra||"（无）",
-          _template:"box"
+          备注:extra||"（无）"
         })
       });
       var data=await res.json();
-      if(res.ok && (data.success || data.message)){
-        msg.textContent="已提交给管理员，审核通过后会出现在索引中。不用登录 GitHub。";
-        toast("提交成功");
+      if(res.ok){
+        msg.textContent="已提交到管理员邮箱。若这是第一次，管理员需要先点确认信。";
+        toast("已发送");
         return;
       }
-      msg.textContent="邮箱通道返回："+(data.message||res.status);
-    }catch(e){msg.textContent="邮箱通道暂时不可用。"}
+      msg.textContent="发送失败："+(data.message||res.status);
+    }catch(e){msg.textContent="邮箱通道暂时连不上。"}
+    return;
   }
-  if(proxy){
+  if(storeReady()){
     try{
-      var res2=await fetch(proxy,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      var res2=await fetch(lcUrl("/classes/Pending"),{
+        method:"POST", headers:lcHeaders(),
+        body:JSON.stringify({name:name,ids:ids,tags:tags,extra:extra,section:section,status:"pending"})
+      });
       var data2=await res2.json();
-      if(data2.ok){msg.textContent="已提交，等待管理员审核。";toast("提交成功");return}
-      msg.textContent="提交通道失败："+(data2.error||res2.status);
+      if(res2.ok && data2.objectId){msg.textContent="已提交到后台审核队列。";toast("提交成功");return}
+      msg.textContent="提交失败："+(data2.error||res2.status);
     }catch(e){msg.textContent="网络失败。"}
+    return;
   }
-  if(!email && !proxy){
-    msg.textContent="管理员还没有配置接收邮箱。请先把群名和群号复制下来发给管理员。";
-    copyText("【游戏王群索引-新群提交】\\n群名："+name+"\\n群号："+ids+"\\n标签："+tags+"\\n备注："+extra);
-  }
+  msg.textContent="管理员还没有填写接收邮箱。请先复制下面内容发给管理员。";
+  copyText("【游戏王群索引-新群提交】\n群名："+name+"\n群号："+ids+"\n标签："+tags+"\n备注："+extra);
 }
+
+
 
 function openEditor(id){
   var g={id:"g"+Date.now(),name:"",tags:[],section:"其他",ids:[],extra:"",missing:false,pinned:false};
@@ -348,14 +368,23 @@ function openSiteSettings(){
   openModal("<h3>发布设置</h3><p class='note'>发布令牌只保存在你这台电脑的浏览器里，不会写进网页文件。请使用 Fine-grained Token，权限只要 Contents 读写 + Issues 读写，仅限本仓库。</p>"+
     "<div class='form-row'><label>GitHub 用户名</label><input id='gOwner' value='"+esc(gh.owner||"")+"'></div>"+
     "<div class='form-row'><label>仓库名</label><input id='gRepo' value='"+esc(gh.repo||"")+"'></div>"+
-    "<div class='form-row'><label>接收提交的邮箱（推荐，用户不用登录）</label><input id='gMail' value='"+esc(DATA.notifyEmail||"")+"' placeholder='you@example.com'></div>"+
-    "<div class='form-row'><label>提交中转地址（可选）</label><input id='gProxy' value='"+esc(gh.submitProxy||"")+"' placeholder='可空'></div>"+
+    "<div class='form-row'><label>接收提交的邮箱（先用这个，用户不用登录）</label><input id='gMail' value='"+esc(DATA.notifyEmail||"")+"' placeholder='you@example.com'></div>"+
+    "<p class='note'>下面三项只有以后要用 LeanCloud 后台队列时才填，现在可空。</p>"+
+    "<div class='form-row'><label>LeanCloud 服务器（REST API 地址）</label><input id='sServer' value='"+esc((DATA.store&&DATA.store.server)||"")+"' placeholder='https://xxxx.lc-cn-n1-shared.com'></div>"+
+    "<div class='form-row'><label>AppID</label><input id='sAppId' value='"+esc((DATA.store&&DATA.store.appId)||"")+"'></div>"+
+    "<div class='form-row'><label>AppKey</label><input id='sAppKey' value='"+esc((DATA.store&&DATA.store.appKey)||"")+"'></div>"+
     "<div class='form-row'><label>发布用 Token</label><input id='gTok' type='password' value='"+esc(tok)+"' placeholder='github_pat_...'></div>"+
     "<div class='toolbar'><button class='btn btn-gold' onclick='saveSiteSettings()'>保存设置</button><button class='btn' onclick='closeModal()'>取消</button></div>");
 }
 function saveSiteSettings(){
-  DATA.github={owner:document.getElementById("gOwner").value.trim(),repo:document.getElementById("gRepo").value.trim(),submitProxy:document.getElementById("gProxy").value.trim()};
+  DATA.github={owner:document.getElementById("gOwner").value.trim(),repo:document.getElementById("gRepo").value.trim(),submitProxy:(DATA.github&&DATA.github.submitProxy)||""};
   DATA.notifyEmail=document.getElementById("gMail").value.trim();
+  DATA.store={
+    type:"leancloud",
+    server:document.getElementById("sServer").value.trim(),
+    appId:document.getElementById("sAppId").value.trim(),
+    appKey:document.getElementById("sAppKey").value.trim()
+  };
   var tok=document.getElementById("gTok").value.trim();
   if(tok) localStorage.setItem(TOKEN_KEY,tok);
   DATA.updated=today();markDirty();closeModal();toast("设置已保存");
@@ -368,19 +397,18 @@ function parseIssuePayload(issue){
   return {name:(issue.title||"").replace(/^【群索引提交】/,"").trim(),ids:"",tags:"",extra:body,section:""};
 }
 async function refreshRemoteQueue(){
-  var gh=DATA.github||{};
-  if(!gh.owner||!gh.repo)return;
+  DATA.pending=DATA.pending||[];
+  if(!storeReady()){render();return}
   try{
-    var res=await fetch("https://api.github.com/repos/"+gh.owner+"/"+gh.repo+"/issues?state=open&labels=group-submit&per_page=50",{headers:{"Accept":"application/vnd.github+json","User-Agent":"ygo-index"}});
-    if(!res.ok)return;
-    var issues=await res.json();
-    DATA.pending=(issues||[]).filter(function(it){return !it.pull_request}).map(function(it){
-      var p=parseIssuePayload(it);
-      return {issue:it.number,url:it.html_url,name:p.name,ids:p.ids,tags:p.tags,extra:p.extra,section:p.section||"",title:it.title};
+    var res=await fetch(lcUrl("/classes/Pending?order=-createdAt&limit=100"),{headers:lcHeaders()});
+    var data=await res.json();
+    DATA.pending=(data.results||[]).map(function(it){
+      return {objectId:it.objectId,name:it.name,ids:it.ids,tags:it.tags,extra:it.extra,section:it.section||"",title:it.name};
     });
     render();
   }catch(e){}
 }
+
 function openQueue(){
   refreshRemoteQueue().then(function(){
     var list=DATA.pending||[];
@@ -398,7 +426,7 @@ function approvePending(i){
   var p=DATA.pending[i];if(!p)return;
   closeModal();
   var tmp={id:"g"+Date.now(),name:p.name||"",tags:(p.tags||"").split(/[，,]/).map(function(x){return x.trim()}).filter(Boolean),section:p.section||"其他",ids:parseIdLines(p.ids||""),extra:typeof p.extra==="string"?p.extra:"",missing:false,pinned:false};
-  DATA._approvingIssue=p.issue;
+  DATA._approvingIssue=p.issue;DATA._approvingOid=p.objectId;
   var idLines=(tmp.ids||[]).map(function(x){return x.num+(x.note?"（"+x.note+"）":"")}).join("\n");
   if(!idLines&&p.ids) idLines=String(p.ids);
   openModal("<h3>通过前确认</h3>"+
@@ -418,13 +446,20 @@ function confirmApprove(){
   DATA.pending=(DATA.pending||[]).filter(function(x){return x.issue!==issue});
   DATA.updated=today();markDirty();closeModal();render();toast("已加入索引，请再点「发布到网站」");
   if(issue) closeIssue(issue,"approved");
+  var oid=DATA._approvingOid;DATA._approvingOid=null;
+  if(oid) deletePending(oid);
 }
 function rejectPending(i){
   var p=DATA.pending[i];if(!p)return;
   DATA.pending.splice(i,1);render();
   if(p.issue) closeIssue(p.issue,"rejected");
+  if(p.objectId) deletePending(p.objectId);
   toast("已拒绝");
   openQueue();
+}
+async function deletePending(oid){
+  if(!storeReady()||!oid)return;
+  try{await fetch(lcUrl("/classes/Pending/"+oid),{method:"DELETE",headers:lcHeaders()})}catch(e){}
 }
 async function closeIssue(num,reason){
   var tok=localStorage.getItem(TOKEN_KEY);var gh=DATA.github||{};
