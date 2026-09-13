@@ -144,9 +144,6 @@ html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b4231
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       </button>
       <button class="icon-btn" id="themeBtn" title="白天/夜间" onclick="toggleTheme()">🌙</button>
-      <button class="icon-btn" id="adminBtn" title="管理员" onclick="openAdmin()" aria-label="管理员">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none"/></svg>
-      </button>
     </div>
     <div class="sub" id="pageSub"></div>
     <button class="pencil" title="编辑副标题" onclick="openFieldEditor('subtitle')">✎ 编辑这句说明</button>
@@ -246,24 +243,32 @@ async function loadData(){
   if(!DATA.pending) DATA.pending=[];
 }
 
-function renderId(id){
+function renderId(id, gid, idx){
   var dead=isUnavailable(id);
   var note=id.note?'<span class="tagnote">（'+esc(id.note)+'）</span>':"";
   var btn=dead?"":'<button type="button" onclick="copyText(\''+esc(id.num)+'\')">复制</button>';
-  return '<span class="idchip'+(dead?" dead":"")+'"><span>'+esc(id.num)+"</span>"+note+btn+"</span>";
+  var ops="";
+  if(isAdmin && gid!=null){
+    ops='<button class="icon-mini" title="修改此群号" onclick="editOneId(\''+gid+'\','+idx+')">✎</button>'+
+        '<button class="icon-mini danger" title="删除此群号" onclick="removeOneId(\''+gid+'\','+idx+')">✕</button>';
+  }
+  return '<span class="idchip'+(dead?" dead":"")+'"><span>'+esc(id.num)+"</span>"+note+btn+ops+"</span>";
 }
 function renderRow(g){
   var allDead=g.ids&&g.ids.length&&liveIds(g).length===0&&!g.missing;
   var extra=g.extra?'<div class="tagnote">'+esc(g.extra)+"</div>":"";
-  var idsHtml=g.missing?'<span class="tagnote">暂缺</span>':(!g.ids||!g.ids.length?'<span class="tagnote">无群号</span>':'<div class="ids">'+g.ids.map(renderId).join("")+"</div>");
+  var idsHtml=g.missing?'<span class="tagnote">暂缺</span>':(!g.ids||!g.ids.length?'<span class="tagnote">无群号</span>':'<div class="ids">'+g.ids.map(function(id,idx){return renderId(id,g.id,idx)}).join("")+"</div>");
   var tags='<div class="tags-cell">'+(g.tags&&g.tags.length?esc(g.tags.join("，")):"无标签")+"</div>";
   var admin="";
   if(isAdmin){
-    admin='<div class="row-ops"><label class="pinbox"><input type="checkbox"'+(g.pinned?" checked":"")+' onchange="togglePin(\''+g.id+'\',this.checked)">置顶</label>'+
-      '<button class="icon-mini" title="修改" onclick="openEditor(\''+g.id+'\')">✎</button>'+
-      '<button class="icon-mini danger" title="删除" onclick="deleteGroup(\''+g.id+'\')">✕</button></div>';
+    admin='<div class="row-ops"><label class="pinbox"><input type="checkbox"'+(g.pinned?" checked":"")+' onchange="togglePin(\''+g.id+'\',this.checked)">置顶</label></div>';
   }
-  return '<div class="row'+(allDead?" all-dead":"")+'" data-id="'+esc(g.id)+'"><div><div class="name'+(g.nameStruck?" struck":"")+'">'+esc(g.name)+"</div>"+extra+"</div><div>"+idsHtml+"</div>"+tags+admin+"</div>";
+  var nameOps="";
+  if(isAdmin){
+    nameOps=' <button class="icon-mini" title="编辑卡组条目" onclick="openEditor(\''+g.id+'\')">✎</button>'+
+            ' <button class="icon-mini danger" title="删除整条卡组" onclick="deleteGroup(\''+g.id+'\')">✕</button>';
+  }
+  return '<div class="row'+(allDead?" all-dead":"")+'" data-id="'+esc(g.id)+'"><div><div class="name'+(g.nameStruck?" struck":"")+'">'+esc(g.name)+nameOps+"</div>"+extra+"</div><div>"+idsHtml+"</div>"+tags+admin+"</div>";
 }
 function ensureAboutFeedback(s){
   var about=s.about||"", qq=s.feedbackQq||"", ans=s.feedbackAnswer||"";
@@ -359,7 +364,28 @@ function logoutAdmin(){isAdmin=false;sessionStorage.removeItem("ygoAdminIcon");h
 
 function findGroup(id){for(var i=0;i<DATA.groups.length;i++) if(DATA.groups[i].id===id) return DATA.groups[i];return null}
 function togglePin(id,on){var g=findGroup(id);if(!g)return;g.pinned=!!on;DATA.updated=today();markDirty();render()}
-function deleteGroup(id){DATA.groups=DATA.groups.filter(function(g){return g.id!==id});DATA.updated=today();markDirty();render();toast("已删除（尚未发布到网站）")}
+function deleteGroup(id){if(!confirm("删除这一整条卡组？"))return;DATA.groups=DATA.groups.filter(function(g){return g.id!==id});DATA.updated=today();markDirty();render();toast("已删除（尚未发布到网站）")}
+function removeOneId(gid,idx){
+  var g=findGroup(gid);if(!g||!g.ids||!g.ids[idx])return;
+  if(!confirm("删除群号 "+g.ids[idx].num+" ？"))return;
+  g.ids.splice(idx,1);DATA.updated=today();markDirty();render();
+}
+function editOneId(gid,idx){
+  var g=findGroup(gid);if(!g||!g.ids||!g.ids[idx])return;
+  var id=g.ids[idx];
+  openModal("<h3>修改群号</h3>"+
+    "<div class='form-row'><label>群号</label><input id='oidNum' value='"+esc(id.num)+"'></div>"+
+    "<div class='form-row'><label>备注</label><input id='oidNote' value='"+esc(id.note||"")+"'></div>"+
+    "<div class='form-row'><label><input type='checkbox' id='oidDead'"+(isUnavailable(id)?" checked":"")+"> 已失效</label></div>"+
+    "<div class='toolbar'><button class='btn btn-gold' onclick='saveOneId(\""+gid+"\","+idx+")'>保存</button><button class='btn' onclick='closeModal()'>取消</button></div>");
+}
+function saveOneId(gid,idx){
+  var g=findGroup(gid);if(!g||!g.ids[idx])return;
+  var num=(document.getElementById("oidNum").value||"").trim();
+  if(!num){toast("群号不能空");return}
+  g.ids[idx]={num:num,note:(document.getElementById("oidNote").value||"").trim(),dead:document.getElementById("oidDead").checked};
+  DATA.updated=today();markDirty();closeModal();render();toast("已保存，请发布到网站");
+}
 
 function parseIdLines(text){
   var out=[];String(text||"").split(/\n+/).forEach(function(line){
