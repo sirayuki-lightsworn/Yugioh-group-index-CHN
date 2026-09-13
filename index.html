@@ -674,28 +674,54 @@ async function closeIssue(num,reason){
   }catch(e){}
 }
 
+function utf8ToB64(str){
+  var bytes=new TextEncoder().encode(str), bin="", i;
+  for(i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function downloadDataFile(){
+  if(!DATA)return;
+  var payload=JSON.parse(JSON.stringify(DATA));
+  delete payload.pending;delete payload._approvingIssue;
+  downloadBlob(JSON.stringify(payload,null,2),"data.json","application/json");
+}
 async function publishToGitHub(){
   var tok=localStorage.getItem(TOKEN_KEY);var gh=DATA.github||{};
   if(!tok){openSiteSettings();toast("请先在发布设置里粘贴 Token");return}
   if(!gh.owner||!gh.repo){toast("缺少仓库信息");return}
+  if(location.protocol==="file:"){
+    openModal("<h3>无法从本地文件发布</h3><p class='note'>请打开线上页再发布：<br>https://sirayuki-lightsworn.github.io/Yugioh-group-index-CHN/<br><br>或先下载 data.json，再到仓库覆盖上传。</p><div class='toolbar'><button class='btn btn-gold' onclick='downloadDataFile()'>下载 data.json</button><button class='btn' onclick='closeModal()'>关闭</button></div>");
+    return;
+  }
   var payload=JSON.parse(JSON.stringify(DATA));
   delete payload.pending;delete payload._approvingIssue;
-  var content=unescape(encodeURIComponent(JSON.stringify(payload,null,2)));
-  var b64=btoa(content);
+  var b64=utf8ToB64(JSON.stringify(payload,null,2));
   toast("正在发布…");
+  var headers={Authorization:"Bearer "+tok.trim(),Accept:"application/vnd.github+json","User-Agent":"ygo-index","X-GitHub-Api-Version":"2022-11-28"};
   try{
-    var meta=await fetch("https://api.github.com/repos/"+gh.owner+"/"+gh.repo+"/contents/data.json",{headers:{Authorization:"Bearer "+tok,Accept:"application/vnd.github+json","User-Agent":"ygo-index"}});
-    var sha=null;if(meta.ok){var mj=await meta.json();sha=mj.sha}
+    var meta=await fetch("https://api.github.com/repos/"+gh.owner+"/"+gh.repo+"/contents/data.json",{headers:headers});
+    var sha=null;
+    if(meta.ok){var mj=await meta.json();sha=mj.sha}
+    else if(meta.status!==404){
+      var err=await meta.json().catch(function(){return {}});
+      openModal("<h3>读取仓库失败</h3><p class='note'>"+esc(err.message||("HTTP "+meta.status))+"</p><p class='note'>常见原因：Token 过期、没开 Contents 写权限、或访问不了 api.github.com。</p><div class='toolbar'><button class='btn btn-gold' onclick='downloadDataFile()'>改为下载 data.json</button><button class='btn' onclick='closeModal()'>关闭</button></div>");
+      return;
+    }
     var put=await fetch("https://api.github.com/repos/"+gh.owner+"/"+gh.repo+"/contents/data.json",{
       method:"PUT",
-      headers:{Authorization:"Bearer "+tok,Accept:"application/vnd.github+json","User-Agent":"ygo-index","Content-Type":"application/json"},
+      headers:Object.assign({"Content-Type":"application/json"},headers),
       body:JSON.stringify({message:"update group index "+payload.updated,content:b64,sha:sha})
     });
-    var pj=await put.json();
-    if(!put.ok){toast("发布失败："+(pj.message||put.status));return}
+    var pj=await put.json().catch(function(){return {}});
+    if(!put.ok){
+      openModal("<h3>发布失败</h3><p class='note'>"+esc(pj.message||("HTTP "+put.status))+"</p><div class='toolbar'><button class='btn btn-gold' onclick='downloadDataFile()'>改为下载 data.json</button><button class='btn' onclick='closeModal()'>关闭</button></div>");
+      return;
+    }
     DIRTY=false;toast("已发布，稍等刷新即可");
-    render();
-  }catch(e){toast("发布失败，请检查 Token 与仓库权限")}
+    closeModal();render();
+  }catch(e){
+    openModal("<h3>发布失败</h3><p class='note'>"+esc(e.message||String(e))+"</p><p class='note'>若是 Failed to fetch，多半是打不开 api.github.com。请下载 data.json 后到仓库手动覆盖。</p><div class='toolbar'><button class='btn btn-gold' onclick='downloadDataFile()'>下载 data.json</button><button class='btn' onclick='closeModal()'>关闭</button></div>");
+  }
 }
 
 function formatIdsTxt(g){if(g.missing)return "暂缺";return (g.ids||[]).map(function(x){return (isUnavailable(x)?"~~"+x.num+"~~":x.num)+(x.note?"（"+x.note+"）":"")}).join("、")}
