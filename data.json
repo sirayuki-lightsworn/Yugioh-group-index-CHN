@@ -716,7 +716,7 @@
       "nameStruck": false,
       "id": "g29",
       "tags": [],
-      "pinned": false
+      "pinned": true
     },
     {
       "name": "超重武者",
@@ -5643,22 +5643,27 @@
       "pinned": false
     },
     {
+      "id": "g261",
       "name": "塞尼特",
       "aliases": [],
+      "tags": [],
       "section": "S",
       "ids": [
         {
           "num": "1062044037",
           "note": "",
           "dead": false
+        },
+        {
+          "num": "955504813",
+          "note": "",
+          "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g261",
-      "tags": [],
-      "pinned": false
+      "pinned": true,
+      "addedAt": 1789342849321
     },
     {
       "name": "淘气仙星",
@@ -7422,7 +7427,7 @@
       "tags": [
         "升月"
       ],
-      "pinned": false
+      "pinned": true
     },
     {
       "name": "异解△",
@@ -7440,7 +7445,7 @@
       "nameStruck": false,
       "id": "g347",
       "tags": [],
-      "pinned": false
+      "pinned": true
     },
     {
       "name": "自奏圣乐/自鸣天琴",
