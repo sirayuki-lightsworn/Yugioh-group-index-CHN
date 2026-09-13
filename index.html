@@ -257,25 +257,47 @@ async function doSubmit(){
   var extra=(document.getElementById("sExtra").value||"").trim();
   var section=document.getElementById("sSec").value;
   if(!name||!ids){toast("请填写群名和群号");return}
-  var payload={name:name,ids:ids,tags:tags,extra:extra,section:section};
+  var payload={name:name,ids:ids,tags:tags,extra:extra,section:section,source:"ygo-index"};
   var msg=document.getElementById("sMsg");
+  msg.textContent="正在提交…";
+  var email=(DATA.notifyEmail||"").trim();
   var proxy=(DATA.github&&DATA.github.submitProxy)||"";
-  if(proxy){
-    msg.textContent="正在提交…";
+  if(email){
     try{
-      var res=await fetch(proxy,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      var res=await fetch("https://formsubmit.co/ajax/"+encodeURIComponent(email),{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Accept":"application/json"},
+        body:JSON.stringify({
+          _subject:"【游戏王群索引】新群提交："+name,
+          群名:name,
+          群号:ids,
+          标签:tags||"（无）",
+          分区:section||"（待定）",
+          备注:extra||"（无）",
+          _template:"box"
+        })
+      });
       var data=await res.json();
-      if(data.ok){msg.textContent="已提交，等待管理员审核。";toast("提交成功");return}
-      msg.textContent="提交通道失败："+(data.error||res.status);
-    }catch(e){msg.textContent="网络失败，将改为打开 GitHub Issue。"}
+      if(res.ok && (data.success || data.message)){
+        msg.textContent="已提交给管理员，审核通过后会出现在索引中。不用登录 GitHub。";
+        toast("提交成功");
+        return;
+      }
+      msg.textContent="邮箱通道返回："+(data.message||res.status);
+    }catch(e){msg.textContent="邮箱通道暂时不可用。"}
   }
-  var title=encodeURIComponent("【群索引提交】"+name);
-  var body=encodeURIComponent("<!-- ygo-submit -->\n```json\n"+JSON.stringify(payload,null,2)+"\n```\n\n群名："+name+"\n群号："+ids+"\n标签："+tags+"\n备注："+extra);
-  var gh=DATA.github||{};
-  var url="https://github.com/"+gh.owner+"/"+gh.repo+"/issues/new?title="+title+"&body="+body+"&labels=group-submit";
-  copyText("【游戏王群索引-新群提交】\n群名："+name+"\n群号："+ids+"\n标签："+tags+"\n备注："+extra);
-  msg.innerHTML="已复制提交文本。若你有 GitHub 账号，可点 <a href='"+url+"' target='_blank'>这里发到审核队列</a>。";
-  window.open(url,"_blank");
+  if(proxy){
+    try{
+      var res2=await fetch(proxy,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      var data2=await res2.json();
+      if(data2.ok){msg.textContent="已提交，等待管理员审核。";toast("提交成功");return}
+      msg.textContent="提交通道失败："+(data2.error||res2.status);
+    }catch(e){msg.textContent="网络失败。"}
+  }
+  if(!email && !proxy){
+    msg.textContent="管理员还没有配置接收邮箱。请先把群名和群号复制下来发给管理员。";
+    copyText("【游戏王群索引-新群提交】\\n群名："+name+"\\n群号："+ids+"\\n标签："+tags+"\\n备注："+extra);
+  }
 }
 
 function openEditor(id){
@@ -326,12 +348,14 @@ function openSiteSettings(){
   openModal("<h3>发布设置</h3><p class='note'>发布令牌只保存在你这台电脑的浏览器里，不会写进网页文件。请使用 Fine-grained Token，权限只要 Contents 读写 + Issues 读写，仅限本仓库。</p>"+
     "<div class='form-row'><label>GitHub 用户名</label><input id='gOwner' value='"+esc(gh.owner||"")+"'></div>"+
     "<div class='form-row'><label>仓库名</label><input id='gRepo' value='"+esc(gh.repo||"")+"'></div>"+
-    "<div class='form-row'><label>提交中转地址（Cloudflare Worker，可空）</label><input id='gProxy' value='"+esc(gh.submitProxy||"")+"' placeholder='https://xxx.workers.dev'></div>"+
+    "<div class='form-row'><label>接收提交的邮箱（推荐，用户不用登录）</label><input id='gMail' value='"+esc(DATA.notifyEmail||"")+"' placeholder='you@example.com'></div>"+
+    "<div class='form-row'><label>提交中转地址（可选）</label><input id='gProxy' value='"+esc(gh.submitProxy||"")+"' placeholder='可空'></div>"+
     "<div class='form-row'><label>发布用 Token</label><input id='gTok' type='password' value='"+esc(tok)+"' placeholder='github_pat_...'></div>"+
     "<div class='toolbar'><button class='btn btn-gold' onclick='saveSiteSettings()'>保存设置</button><button class='btn' onclick='closeModal()'>取消</button></div>");
 }
 function saveSiteSettings(){
   DATA.github={owner:document.getElementById("gOwner").value.trim(),repo:document.getElementById("gRepo").value.trim(),submitProxy:document.getElementById("gProxy").value.trim()};
+  DATA.notifyEmail=document.getElementById("gMail").value.trim();
   var tok=document.getElementById("gTok").value.trim();
   if(tok) localStorage.setItem(TOKEN_KEY,tok);
   DATA.updated=today();markDirty();closeModal();toast("设置已保存");
