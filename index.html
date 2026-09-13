@@ -109,12 +109,28 @@ html[data-theme="light"] .idchip{background:#f7f9fc;border-color:#c5d0dc}
 }
 .icon-btn:hover{border-color:var(--gold);color:var(--gold2)}
 .icon-btn.on{border-color:var(--gold);color:var(--gold2)}
+#adminBtn{display:none}
+#adminBtn.show{display:inline-flex}
+
 .btn-add{background:#067647;border-color:#05603a;color:#fff;font-weight:700;height:40px;font-size:14px;padding:0 14px}
 .btn-add:hover{border-color:#7dcea0;color:#fff}
 .pencil{display:none;border:0;background:transparent;color:var(--gold);cursor:pointer;font-size:13px;padding:0 4px}
 body.admin .pencil{display:inline}
 #queueBtn{display:none}
 body.admin.show-queue #queueBtn{display:inline-flex}
+
+
+.row-ops{display:none;align-items:center;gap:6px;flex-wrap:wrap}
+body.admin .row-ops{display:inline-flex}
+.icon-mini{
+  width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
+  background:var(--card);color:var(--text);cursor:pointer;font-size:14px;
+  display:inline-flex;align-items:center;justify-content:center;padding:0;
+}
+.icon-mini:hover{border-color:var(--gold);color:var(--gold2)}
+.icon-mini.danger{color:var(--danger);border-color:#8a4040}
+.icon-mini.danger:hover{background:#3a1818;color:#ff8a8a}
+html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b42318}
 
 </style>
 </head>
@@ -243,9 +259,9 @@ function renderRow(g){
   var tags='<div class="tags-cell">'+(g.tags&&g.tags.length?esc(g.tags.join("，")):"无标签")+"</div>";
   var admin="";
   if(isAdmin){
-    admin='<div class="toolbar"><label class="pinbox"><input type="checkbox"'+(g.pinned?" checked":"")+' onchange="togglePin(\''+g.id+'\',this.checked)">置顶</label>'+
-      '<button class="btn" onclick="openEditor(\''+g.id+'\')">修改</button>'+
-      '<button class="btn btn-danger" onclick="deleteGroup(\''+g.id+'\')">删除</button></div>';
+    admin='<div class="row-ops"><label class="pinbox"><input type="checkbox"'+(g.pinned?" checked":"")+' onchange="togglePin(\''+g.id+'\',this.checked)">置顶</label>'+
+      '<button class="icon-mini" title="修改" onclick="openEditor(\''+g.id+'\')">✎</button>'+
+      '<button class="icon-mini danger" title="删除" onclick="deleteGroup(\''+g.id+'\')">✕</button></div>';
   }
   return '<div class="row'+(allDead?" all-dead":"")+'" data-id="'+esc(g.id)+'"><div><div class="name'+(g.nameStruck?" struck":"")+'">'+esc(g.name)+"</div>"+extra+"</div><div>"+idsHtml+"</div>"+tags+admin+"</div>";
 }
@@ -297,7 +313,35 @@ function toggleExportMenu(ev){if(ev)ev.stopPropagation();document.getElementById
 function toggleSubmitMenu(ev){if(ev)ev.stopPropagation();document.getElementById("submitDrop").classList.toggle("open");var e=document.getElementById("exportDrop");if(e)e.classList.remove("open")}
 document.addEventListener("click",function(){["exportDrop","submitDrop"].forEach(function(id){var b=document.getElementById(id);if(b)b.classList.remove("open")})});
 
+var titleClicks=0, titleClickTimer=null;
+function revealAdminBtn(){
+  var b=document.getElementById("adminBtn");
+  if(b) b.classList.add("show");
+  sessionStorage.setItem("ygoAdminIcon","1");
+}
+function hideAdminBtn(){
+  var b=document.getElementById("adminBtn");
+  if(b && !isAdmin) b.classList.remove("show");
+}
+function checkAdminSecret(){
+  var q=location.search+location.hash;
+  if(/[?&#]admin\b/.test(q) || sessionStorage.getItem("ygoAdminIcon")==="1") revealAdminBtn();
+}
+function onTitleClick(){
+  titleClicks++;
+  clearTimeout(titleClickTimer);
+  titleClickTimer=setTimeout(function(){titleClicks=0},1200);
+  if(titleClicks>=5){titleClicks=0;revealAdminBtn();openAdmin();toast("已打开管理入口")}
+}
+document.addEventListener("DOMContentLoaded",function(){
+  checkAdminSecret();
+  var h=document.getElementById("pageTitle");
+  if(h) h.addEventListener("click",onTitleClick);
+});
+checkAdminSecret();
+
 function openAdmin(){
+  revealAdminBtn();
   if(isAdmin){toast("已在管理");return}
   var stored=localStorage.getItem(ADMIN_KEY);
   openModal("<h3>管理员登录</h3><p class='note'>"+(stored?"输入管理员密码。":"第一次使用请设定密码（只存在这台浏览器）。")+"</p>"+
@@ -307,11 +351,11 @@ function openAdmin(){
 function doLogin(){
   var pw=document.getElementById("pw").value||"";if(!pw){toast("请输入密码");return}
   var h=hashPw(pw), stored=localStorage.getItem(ADMIN_KEY);
-  if(!stored){localStorage.setItem(ADMIN_KEY,h);isAdmin=true;closeModal();render();toast("已设定密码");return}
-  if(stored===h){isAdmin=true;closeModal();render();refreshRemoteQueue();toast("已进入管理")}
+  if(!stored){localStorage.setItem(ADMIN_KEY,h);isAdmin=true;revealAdminBtn();closeModal();render();toast("已设定密码");return}
+  if(stored===h){isAdmin=true;revealAdminBtn();closeModal();render();refreshRemoteQueue();toast("已进入管理")}
   else toast("密码不对");
 }
-function logoutAdmin(){isAdmin=false;render()}
+function logoutAdmin(){isAdmin=false;sessionStorage.removeItem("ygoAdminIcon");hideAdminBtn();render()}
 
 function findGroup(id){for(var i=0;i<DATA.groups.length;i++) if(DATA.groups[i].id===id) return DATA.groups[i];return null}
 function togglePin(id,on){var g=findGroup(id);if(!g)return;g.pinned=!!on;DATA.updated=today();markDirty();render()}
@@ -345,7 +389,7 @@ function openSubmit(){
   var editBtn = isAdmin ? "<button class='pencil' style='display:inline' onclick='openCopyEditor()'>✎ 改这段说明</button>" : "";
   openModal("<h3>"+esc(c.title)+" "+editBtn+"</h3><p class='note'>"+esc(c.hint)+"</p>"+
     "<input type='hidden' id='sKind' value='add'>"+
-    "<div class='form-row'><label>内容 *</label><textarea id='sBody' rows='8' placeholder='直接把要说的写在这里'></textarea></div>"+
+    "<div class='form-row'><label>内容 *</label><textarea id='sBody' rows='8'></textarea></div>"+
     "<div class='form-row'><label>联系方式（选填，QQ / 邮箱 / 其他）</label><input id='sContact' placeholder='方便通知你审核结果'></div>"+
     "<div class='toolbar'><button class='btn btn-add' onclick='doSubmit()'>提交</button><button class='btn' onclick='closeModal()'>取消</button></div>"+
     "<p class='note' id='sMsg' style='margin-top:10px'></p>");
