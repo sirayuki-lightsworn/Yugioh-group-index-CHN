@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>游戏王群索引</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312161f'/%3E%3Crect x='12' y='8' width='40' height='48' rx='4' fill='%23d4b15f'/%3E%3Crect x='16' y='12' width='32' height='40' rx='2' fill='%231c2330'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='22' font-family='Arial,sans-serif' font-weight='700' fill='%23f0d78c'%3E群%3C/text%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312161f'/%3E%3Crect x='12' y='8' width='40' height='48' rx='4' fill='%23d4b15f'/%3E%3Crect x='16' y='12' width='32' height='40' rx='2' fill='%231c2330'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='22' font-family='Arial,sans-serif' font-weight='700' fill='%23f0d78c'%3E群%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <style>
 :root {
@@ -107,6 +108,7 @@ html[data-theme="light"] .idchip{background:#f7f9fc;border-color:#c5d0dc}
   display:inline-flex;align-items:center;justify-content:center;
 }
 .icon-btn:hover{border-color:var(--gold);color:var(--gold2)}
+.icon-btn.on{border-color:var(--gold);color:var(--gold2)}
 .btn-add{background:#067647;border-color:#05603a;color:#fff;font-weight:700;height:40px;font-size:14px;padding:0 14px}
 .btn-add:hover{border-color:#7dcea0;color:#fff}
 .pencil{display:none;border:0;background:transparent;color:var(--gold);cursor:pointer;font-size:13px;padding:0 4px}
@@ -122,8 +124,13 @@ body.admin.show-queue #queueBtn{display:inline-flex}
     <div class="title-row">
       <h1 id="pageTitle">游戏王群索引</h1>
       <button class="pencil" title="编辑标题" onclick="openFieldEditor('title')">✎</button>
+      <button class="icon-btn" id="reloadBtn" title="刷新列表" onclick="reloadData()" aria-label="刷新">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
       <button class="icon-btn" id="themeBtn" title="白天/夜间" onclick="toggleTheme()">🌙</button>
-      <button class="icon-btn" id="adminBtn" title="管理员" onclick="openAdmin()">⚙</button>
+      <button class="icon-btn" id="adminBtn" title="管理员" onclick="openAdmin()" aria-label="管理员">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none"/></svg>
+      </button>
     </div>
     <div class="sub" id="pageSub"></div>
     <button class="pencil" title="编辑副标题" onclick="openFieldEditor('subtitle')">✎ 编辑这句说明</button>
@@ -204,6 +211,15 @@ function matches(g,q){return !q||searchBlob(g).indexOf(q)!==-1}
 
 function markDirty(){DIRTY=true;var el=document.getElementById("lastUpdate");if(el&&DATA)el.textContent="最后更新于："+DATA.updated+"（有未发布的本地修改）"}
 
+async function reloadData(){
+  toast("正在刷新…");
+  try{
+    await loadData();
+    DIRTY=false;
+    render();
+    toast("已刷新");
+  }catch(e){toast("刷新失败，请稍后再试")}
+}
 async function loadData(){
   var res=await fetch("data.json?ts="+Date.now(),{cache:"no-store"});
   if(!res.ok) throw new Error("data.json 加载失败");
@@ -267,7 +283,7 @@ function render(){
   document.body.classList.toggle("admin",isAdmin);
   document.body.classList.toggle("hide-dead",hideDead);
   var ab=document.getElementById("adminBtn");
-  if(ab){ab.title=isAdmin?"管理中，点击可改密码入口在工具栏":"管理员";ab.textContent="⚙"}
+  if(ab){ab.title=isAdmin?"管理中":"管理员";ab.classList.toggle("on",isAdmin)}
   document.body.classList.toggle("show-queue", isAdmin && storeReady());
   var pb=document.getElementById("pendBadge");
   if(pb){var n=(DATA.pending||[]).length;pb.textContent=n?(" "+n):""}
