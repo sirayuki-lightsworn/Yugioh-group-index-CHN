@@ -65,20 +65,37 @@ body.admin .pinbox{display:inline-flex}
 .badge{display:inline-block;background:#3a3018;color:var(--gold2);border-radius:999px;padding:1px 8px;font-size:12px;margin-left:6px}
 
 html[data-theme="light"]{
-  --bg:#f3efe6; --bg2:#fffaf1; --card:#ffffff; --line:#e2d6c2;
-  --text:#2b261c; --muted:#6f6658; --gold:#9a7418; --gold2:#6e5210;
-  --blue:#2b6bcf; --danger:#c44545; --ok:#2f7d55; --dead:#8a8378;
+  --bg:#eef2f6; --bg2:#ffffff; --card:#ffffff; --line:#c5d0dc;
+  --text:#1c2430; --muted:#5b6b7c; --gold:#8a5a12; --gold2:#6a430c;
+  --blue:#1d5fd0; --danger:#b42318; --ok:#067647; --dead:#6b7785;
 }
 html[data-theme="light"] header.hero{
-  background:linear-gradient(160deg,#fff6e4 0%,#f7f0e3 60%,#f3efe6 100%);
+  background:#ffffff;
+  border-color:#c5d0dc;
 }
 html[data-theme="light"] .search-card{
-  background:linear-gradient(180deg,#fff6e4,#fff);
-  border-color:#c9a24a;
+  background:#fff;
+  border-color:#1d5fd0;
 }
-html[data-theme="light"] .search-card input{background:#fff;border-color:#dcc48a;color:var(--text)}
-html[data-theme="light"] .letters{background:rgba(243,239,230,.94)}
-html[data-theme="light"] .featured{background:linear-gradient(180deg,#fff6e4,#fff)}
+html[data-theme="light"] .search-card label{color:#1d5fd0}
+html[data-theme="light"] .search-card input{background:#f7f9fc;border-color:#c5d0dc;color:var(--text)}
+html[data-theme="light"] .letters{background:rgba(238,242,246,.96)}
+html[data-theme="light"] .featured{background:#fff;border-color:#c5d0dc}
+html[data-theme="light"] .btn{
+  background:#fff; color:#1c2430; border-color:#8ea0b3;
+}
+html[data-theme="light"] .btn:hover{border-color:#1d5fd0;color:#1d5fd0}
+html[data-theme="light"] .btn-gold{background:#fff4d6;border-color:#c9a227;color:#6a430c}
+html[data-theme="light"] .btn-add{background:#067647;border-color:#05603a;color:#fff}
+html[data-theme="light"] .icon-btn{background:#fff;border-color:#8ea0b3;color:#1c2430}
+html[data-theme="light"] .modal{background:#fff;border-color:#c5d0dc}
+html[data-theme="light"] .form-row input,html[data-theme="light"] .form-row textarea,html[data-theme="light"] .form-row select{
+  background:#f7f9fc;border-color:#c5d0dc;color:#1c2430;
+}
+html[data-theme="light"] .drop-menu{background:#fff;border-color:#c5d0dc}
+html[data-theme="light"] .drop-menu button{color:#1c2430}
+html[data-theme="light"] .drop-menu button:hover{background:#eef2f6;color:#1d5fd0}
+html[data-theme="light"] .idchip{background:#f7f9fc;border-color:#c5d0dc}
 .title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .title-row h1{margin:0}
 .icon-btn{
@@ -87,7 +104,7 @@ html[data-theme="light"] .featured{background:linear-gradient(180deg,#fff6e4,#ff
   display:inline-flex;align-items:center;justify-content:center;
 }
 .icon-btn:hover{border-color:var(--gold);color:var(--gold2)}
-.btn-add{background:#1f6b3a;border-color:#2f8a4e;color:#eafff1;font-weight:700}
+.btn-add{background:#067647;border-color:#05603a;color:#fff;font-weight:700;min-width:48px;height:40px;font-size:22px;line-height:1;padding:0 14px}
 .btn-add:hover{border-color:#7dcea0;color:#fff}
 .pencil{display:none;border:0;background:transparent;color:var(--gold);cursor:pointer;font-size:13px;padding:0 4px}
 body.admin .pencil{display:inline}
@@ -110,7 +127,7 @@ body.admin.show-queue #queueBtn{display:inline-flex}
     <div class="updated" id="lastUpdate"></div>
     <div class="toolbar">
       <div class="drop" id="submitDrop">
-        <button class="btn btn-add" onclick="toggleSubmitMenu(event)">+ 投稿</button>
+        <button class="btn btn-add" onclick="toggleSubmitMenu(event)" title="投稿">+</button>
         <div class="drop-menu">
           <button type="button" onclick="openSubmit('group')">更新群信息</button>
           <button type="button" onclick="openSubmit('feedback')">意见 / 新功能</button>
@@ -129,7 +146,7 @@ body.admin.show-queue #queueBtn{display:inline-flex}
       <button class="btn admin-only" id="queueBtn" onclick="openQueue()">审核队列<span class="badge" id="pendBadge"></span></button>
       <button class="btn btn-gold admin-only" onclick="openEditor(null)">直接新增</button>
       <button class="btn admin-only" onclick="openSiteSettings()">发布设置</button>
-      <button class="btn admin-only" onclick="openPassword()">修改密码</button>
+      <button class="btn admin-only" onclick="openCopyEditor()">编辑投稿文案</button><button class="btn admin-only" onclick="openPassword()">修改密码</button>
       <button class="btn admin-only" onclick="publishToGitHub()">发布到网站</button>
       <button class="btn admin-only" onclick="logoutAdmin()">退出管理</button>
     </div>
@@ -299,14 +316,26 @@ function parseIdLines(text){
   });return out;
 }
 
+function defaultCopy(){
+  return {
+    groupTitle:"更新群信息",
+    groupHint:"随便写。可以是新群号、老群炸了要换、改名、补充别名，或其他和群索引有关的情况。想知道有没有被收录，请留下 QQ 或邮箱。",
+    feedbackTitle:"意见 / 新功能",
+    feedbackHint:"写你想说的即可：建议、新功能、页面问题都可以。想收到回复请留下 QQ 或邮箱。"
+  };
+}
+function getCopy(){
+  var d=defaultCopy(), c=DATA&&DATA.copy||{};
+  return {groupTitle:c.groupTitle||d.groupTitle,groupHint:c.groupHint||d.groupHint,feedbackTitle:c.feedbackTitle||d.feedbackTitle,feedbackHint:c.feedbackHint||d.feedbackHint};
+}
 function openSubmit(kind){
   kind = kind || "group";
   var s=document.getElementById("submitDrop"); if(s) s.classList.remove("open");
-  var title = kind==="feedback" ? "意见 / 新功能" : "更新群信息";
-  var hint = kind==="feedback"
-    ? "写你想说的即可：建议、新功能、页面问题都可以。想收到回复请留下 QQ 或邮箱。"
-    : "随便写。可以是新群号、老群炸了要换、改名、补充别名，或其他和群索引有关的情况。想知道有没有被收录，请留下 QQ 或邮箱。";
-  openModal("<h3>"+title+"</h3><p class='note'>"+hint+"</p>"+
+  var c=getCopy();
+  var title = kind==="feedback" ? c.feedbackTitle : c.groupTitle;
+  var hint = kind==="feedback" ? c.feedbackHint : c.groupHint;
+  var editBtn = isAdmin ? "<button class='pencil' style='display:inline' onclick='openCopyEditor()'>✎ 改这段说明</button>" : "";
+  openModal("<h3>"+esc(title)+" "+editBtn+"</h3><p class='note'>"+esc(hint)+"</p>"+
     "<input type='hidden' id='sKind' value='"+kind+"'>"+
     "<div class='form-row'><label>内容 *</label><textarea id='sBody' rows='8' placeholder='直接把要说的写在这里'></textarea></div>"+
     "<div class='form-row'><label>联系方式（选填，QQ / 邮箱 / 其他）</label><input id='sContact' placeholder='方便通知你审核结果'></div>"+
@@ -388,6 +417,24 @@ function saveEditor(id,exists){
 }
 
 
+function openCopyEditor(){
+  var c=getCopy();
+  openModal("<h3>编辑投稿对话框文案</h3>"+
+    "<div class='form-row'><label>「更新群信息」标题</label><input id='cGT' value='"+esc(c.groupTitle)+"'></div>"+
+    "<div class='form-row'><label>「更新群信息」说明</label><textarea id='cGH' rows='4'>"+esc(c.groupHint)+"</textarea></div>"+
+    "<div class='form-row'><label>「意见/新功能」标题</label><input id='cFT' value='"+esc(c.feedbackTitle)+"'></div>"+
+    "<div class='form-row'><label>「意见/新功能」说明</label><textarea id='cFH' rows='4'>"+esc(c.feedbackHint)+"</textarea></div>"+
+    "<div class='toolbar'><button class='btn btn-gold' onclick='saveCopyEditor()'>保存</button><button class='btn' onclick='closeModal()'>取消</button></div>");
+}
+function saveCopyEditor(){
+  DATA.copy={
+    groupTitle:document.getElementById("cGT").value,
+    groupHint:document.getElementById("cGH").value,
+    feedbackTitle:document.getElementById("cFT").value,
+    feedbackHint:document.getElementById("cFH").value
+  };
+  DATA.updated=today();markDirty();closeModal();toast("已保存文案，请发布到网站");
+}
 function openFieldEditor(field){
   var label={title:"标题",subtitle:"标题下说明",about:"说明正文",footerNote:"页脚",links:"实用连接"}[field]||field;
   var val="";
