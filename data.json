@@ -8910,6 +8910,28 @@
       "missing": false,
       "pinned": true,
       "addedAt": 1789346163732
+    },
+    {
+      "id": "g1789363638123",
+      "name": "睡醒一杯！",
+      "aliases": [
+        "WAKE CUP!"
+      ],
+      "tags": [
+        "WAKE CUP!"
+      ],
+      "section": "其他",
+      "ids": [
+        {
+          "num": "2156065365",
+          "note": "",
+          "dead": false
+        }
+      ],
+      "extra": "",
+      "missing": false,
+      "pinned": false,
+      "addedAt": 1789363689581
     }
   ],
   "github": {
@@ -8928,5 +8950,5 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T05:22:53.270Z"
+  "publishedAt": "2026-09-14T05:29:22.635Z"
 }
