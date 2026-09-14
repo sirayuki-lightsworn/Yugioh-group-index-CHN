@@ -4210,8 +4210,12 @@
       "pinned": false
     },
     {
-      "name": "命运英雄（D-HERO）",
+      "id": "g192",
+      "name": "命运英雄",
       "aliases": [
+        "D-HERO"
+      ],
+      "tags": [
         "D-HERO"
       ],
       "section": "M",
@@ -4223,18 +4227,19 @@
         },
         {
           "num": "700129581",
-          "note": "新群",
+          "note": "",
+          "dead": false
+        },
+        {
+          "num": "1093489770",
+          "note": "",
           "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g192",
-      "tags": [
-        "D-HERO"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789400512954
     },
     {
       "name": "M∀LICE",
@@ -8939,6 +8944,48 @@
       "missing": false,
       "pinned": false,
       "addedAt": 1789363689581
+    },
+    {
+      "id": "g1789400642382",
+      "name": "死灵之颜",
+      "aliases": [
+        "死人脸",
+        "除外均"
+      ],
+      "tags": [
+        "死人脸",
+        "除外均"
+      ],
+      "section": "其他",
+      "ids": [
+        {
+          "num": "1037242223",
+          "note": "",
+          "dead": false
+        }
+      ],
+      "extra": "",
+      "missing": false,
+      "pinned": false,
+      "addedAt": 1789400669365
+    },
+    {
+      "id": "g1789400693817",
+      "name": "408模式",
+      "aliases": [],
+      "tags": [],
+      "section": "其他",
+      "ids": [
+        {
+          "num": "708942347",
+          "note": "2群",
+          "dead": false
+        }
+      ],
+      "extra": "",
+      "missing": false,
+      "pinned": false,
+      "addedAt": 1789400721166
     }
   ],
   "github": {
@@ -8957,5 +9004,5 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T07:53:46.712Z"
+  "publishedAt": "2026-09-14T15:45:23.562Z"
 }
