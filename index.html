@@ -295,7 +295,8 @@ function render(){
   document.title=DATA.title||"游戏王群索引";
   document.getElementById("pageTitle").textContent=DATA.title||"游戏王群索引";
   document.getElementById("pageSub").textContent=DATA.subtitle||"";
-  document.getElementById("lastUpdate").textContent="最后更新于："+(DATA.updated||"")+(DIRTY?"（有未发布的本地修改）":"");
+  var live=DATA.publishedAt?(" · 站点版本："+formatClock(DATA.publishedAt)):"";
+  document.getElementById("lastUpdate").textContent="最后更新于："+(DATA.updated||"")+live+(DIRTY?"（有未发布的本地修改）":"");
   document.getElementById("footerNote").textContent=DATA.footerNote||"";
   document.getElementById("linkList").innerHTML=(DATA.links||[]).map(function(L){return "<li><a href='"+esc(L.url)+"' target='_blank' rel='noopener'>"+esc(L.label)+"</a></li>"}).join("");
   document.getElementById("aboutCard").innerHTML="<h2>说明 <button class='pencil' onclick=\"openFieldEditor('about')\">✎</button></h2><div class='note'>"+esc(ensureAboutFeedback(DATA))+"</div>";
@@ -687,6 +688,34 @@ async function closeIssue(num,reason){
   }catch(e){}
 }
 
+
+function formatClock(iso){
+  if(!iso)return "";
+  var d=new Date(iso); if(isNaN(d.getTime())) return iso;
+  var p=function(n){return ("0"+n).slice(-2)};
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());
+}
+async function waitUntilLive(stamp){
+  var start=Date.now(), tries=0;
+  toast("已提交，正在等待网站刷新…");
+  while(tries<40){
+    await new Promise(function(r){setTimeout(r,2000)});
+    tries++;
+    try{
+      var res=await fetch("data.json?live="+Date.now(),{cache:"no-store"});
+      if(!res.ok) continue;
+      var live=await res.json();
+      if(live.publishedAt===stamp){
+        var sec=Math.round((Date.now()-start)/1000);
+        DATA.publishedAt=stamp;
+        render();
+        toast("网站已更新，用了 "+sec+" 秒");
+        return;
+      }
+    }catch(e){}
+  }
+  toast("仍未刷出，可再点刷新图标或稍等");
+}
 function utf8ToB64(str){
   var bytes=new TextEncoder().encode(str), bin="", i;
   for(i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]);
@@ -708,6 +737,7 @@ async function publishToGitHub(){
   }
   var payload=JSON.parse(JSON.stringify(DATA));
   delete payload.pending;delete payload._approvingIssue;
+  payload.publishedAt=new Date().toISOString();
   var b64=utf8ToB64(JSON.stringify(payload,null,2));
   toast("正在发布…");
   var headers={Authorization:"Bearer "+tok.trim(),Accept:"application/vnd.github+json","User-Agent":"ygo-index","X-GitHub-Api-Version":"2022-11-28"};
@@ -730,8 +760,12 @@ async function publishToGitHub(){
       openModal("<h3>发布失败</h3><p class='note'>"+esc(pj.message||("HTTP "+put.status))+"</p><div class='toolbar'><button class='btn btn-gold' onclick='downloadDataFile()'>改为下载 data.json</button><button class='btn' onclick='closeModal()'>关闭</button></div>");
       return;
     }
-    DIRTY=false;toast("已发布，稍等刷新即可");
-    closeModal();render();
+    DATA.publishedAt=payload.publishedAt;
+    DIRTY=false;
+    closeModal();
+    render();
+    waitUntilLive(payload.publishedAt);
+
   }catch(e){
     openModal("<h3>发布失败</h3><p class='note'>"+esc(e.message||String(e))+"</p><p class='note'>若是 Failed to fetch，多半是打不开 api.github.com。请下载 data.json 后到仓库手动覆盖。</p><div class='toolbar'><button class='btn btn-gold' onclick='downloadDataFile()'>下载 data.json</button><button class='btn' onclick='closeModal()'>关闭</button></div>");
   }
