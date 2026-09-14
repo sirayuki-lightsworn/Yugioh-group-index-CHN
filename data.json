@@ -719,7 +719,7 @@
       ],
       "extra": "",
       "missing": false,
-      "pinned": false,
+      "pinned": true,
       "addedAt": 1789345779684
     },
     {
@@ -5666,7 +5666,7 @@
       ],
       "extra": "",
       "missing": false,
-      "pinned": false,
+      "pinned": true,
       "addedAt": 1789342849321
     },
     {
@@ -7412,9 +7412,15 @@
       "pinned": false
     },
     {
+      "id": "g346",
       "name": "盈彩月夜/升月",
       "aliases": [
-        "升月"
+        "升月",
+        "レイズ・ムーン"
+      ],
+      "tags": [
+        "升月",
+        "レイズ・ムーン"
       ],
       "section": "Y",
       "ids": [
@@ -7426,12 +7432,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g346",
-      "tags": [
-        "升月"
-      ],
-      "pinned": false
+      "pinned": true,
+      "addedAt": 1789346333622
     },
     {
       "name": "异解△",
@@ -8869,11 +8871,6 @@
           "num": "1057253655",
           "note": "",
           "dead": false
-        },
-        {
-          "num": "123456",
-          "note": "",
-          "dead": false
         }
       ],
       "extra": "",
@@ -8898,5 +8895,5 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T00:36:12.551Z"
+  "publishedAt": "2026-09-14T00:39:09.895Z"
 }
