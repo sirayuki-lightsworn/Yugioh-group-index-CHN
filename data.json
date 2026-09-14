@@ -1854,9 +1854,15 @@
       "pinned": false
     },
     {
-      "name": "鬼骨冢（TCG MAMU先行）",
+      "id": "g83",
+      "name": "南瓜王",
       "aliases": [
-        "TCG MAMU先行"
+        "活死人的呼声",
+        "活呼"
+      ],
+      "tags": [
+        "活死人的呼声",
+        "活呼"
       ],
       "section": "G",
       "ids": [
@@ -1868,12 +1874,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g83",
-      "tags": [
-        "TCG MAMU先行"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789372412848
     },
     {
       "name": "GMX（TCG 1304先行恐龙主题）",
@@ -8955,5 +8957,5 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T06:42:40.596Z"
+  "publishedAt": "2026-09-14T07:53:46.712Z"
 }
