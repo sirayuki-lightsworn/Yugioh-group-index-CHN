@@ -1,5 +1,5 @@
 {
-  "updated": "13/09/2026",
+  "updated": "14/09/2026",
   "title": "游戏王群索引",
   "subtitle": "为防止不同翻译混淆，OCG/TCG 先行暂不录入暂时译名，直接显示原本日文/英文名称。待统一翻译后再替换。",
   "about": "首先感谢所有提供群号的群友以及之前做索引的前辈们。大家都是这份索引的作者。\n\n名称基本上以中文全称（NW 译名）为准。没有明显字段的卡组，可直接搜索关键词，例如「刺猬」「废二」。多种叫法会尽量都标在别名/标签里。日文原文字段，TCG英文名称等会慢慢更新。未 O 化的 TCG 系列以英文 + TCG 卡包显示。\n\n每个群号编辑时都验证过。【验证】的意思是我用QQ搜索该群号能正常显示并申请。QQ 搜索时可能不显示群名，请尽量用群号搜索。\n\n如果遇到群号搜不到等情况，多半是群炸了或者群主隐藏了。如果你有新的群号或者报告旧群不存在了等问题，请使用网页上方的【添加】功能报告给我。\n\n此索引主要为【卡组】群索引。因此暂时不收录【地区】【大学】群等其他分类。\n\n索引群：746902919 继续存在。入群问题答案：形而上学枫叶。目前没有关闭的考虑，会继续在里面上传原始的word文档作为存档。",
@@ -35,12 +35,18 @@
   "groups": [
     {
       "id": "featured",
-      "name": "Angelechy（TCG 1401 先行 象棋卡组）",
+      "name": "Angelechy",
       "aliases": [
-        "TCG 1401 先行 象棋卡组"
+        "TCG",
+        "1401",
+        "先行",
+        "象棋"
       ],
       "tags": [
-        "TCG 1401 先行 象棋卡组"
+        "TCG",
+        "1401",
+        "先行",
+        "象棋"
       ],
       "section": "A",
       "ids": [
@@ -58,7 +64,7 @@
       "extra": "",
       "missing": false,
       "pinned": true,
-      "addedAt": 1789344360557
+      "addedAt": 1789360909025
     },
     {
       "name": "ABC",
@@ -84,8 +90,16 @@
       "pinned": false
     },
     {
+      "id": "g2",
       "name": "暗黑界",
-      "aliases": [],
+      "aliases": [
+        "暗黒界",
+        "Dark World"
+      ],
+      "tags": [
+        "暗黒界",
+        "Dark World"
+      ],
       "section": "A",
       "ids": [
         {
@@ -96,10 +110,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g2",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789360975234
     },
     {
       "name": "艾克佐迪亚（老埃）",
@@ -129,11 +141,17 @@
       "pinned": false
     },
     {
-      "name": "ASHENED（TCG 1203）",
+      "id": "g4",
+      "name": "灰灭都",
       "aliases": [
-        "TCG 1203"
+        "灰滅せし都",
+        "Ashened"
       ],
-      "section": "A",
+      "tags": [
+        "灰滅せし都",
+        "Ashened"
+      ],
+      "section": "H",
       "ids": [
         {
           "num": "186955253",
@@ -148,12 +166,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g4",
-      "tags": [
-        "TCG 1203"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361026884
     },
     {
       "name": "黯黑世界/恶魔娘",
@@ -1897,11 +1911,6 @@
       "section": "G",
       "ids": [
         {
-          "num": "1094387932",
-          "note": "",
-          "dead": false
-        },
-        {
           "num": "1029796304",
           "note": "",
           "dead": false
@@ -1961,10 +1970,29 @@
       "pinned": false
     },
     {
-      "name": "海皇/水精鳞（水产）",
+      "id": "g88",
+      "name": "海皇/水精鳞",
       "aliases": [
-        "水精鳞（水产）",
-        "水产"
+        "海皇",
+        "水精鳞",
+        "水产",
+        "Atlantean",
+        "深渊",
+        "水精鱗",
+        "Mermail",
+        "アビス",
+        "Abyss"
+      ],
+      "tags": [
+        "海皇",
+        "水精鳞",
+        "水产",
+        "Atlantean",
+        "深渊",
+        "水精鱗",
+        "Mermail",
+        "アビス",
+        "Abyss"
       ],
       "section": "H",
       "ids": [
@@ -1975,19 +2003,14 @@
         },
         {
           "num": "1059290295",
-          "note": "备用群",
+          "note": "",
           "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g88",
-      "tags": [
-        "水精鳞（水产）",
-        "水产"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361272499
     },
     {
       "name": "黑羽",
@@ -2036,45 +2059,46 @@
       "pinned": false
     },
     {
+      "id": "g91",
       "name": "幻兽机",
       "aliases": [],
+      "tags": [],
       "section": "H",
       "ids": [
         {
-          "num": "227819223",
-          "note": "无法申请",
-          "dead": true
-        },
-        {
           "num": "642490248",
-          "note": "新群",
+          "note": "",
           "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": true,
-      "id": "g91",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361330076
     },
     {
+      "id": "g92",
       "name": "化合兽",
-      "aliases": [],
+      "aliases": [
+        "化合獣",
+        "Chemicritter"
+      ],
+      "tags": [
+        "化合獣",
+        "Chemicritter"
+      ],
       "section": "H",
       "ids": [
         {
           "num": "669719265",
-          "note": "新群，老群已解散",
+          "note": "",
           "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g92",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361304401
     },
     {
       "name": "花札卫",
@@ -5644,8 +5668,12 @@
     {
       "id": "g261",
       "name": "塞尼特",
-      "aliases": [],
-      "tags": [],
+      "aliases": [
+        "セネト"
+      ],
+      "tags": [
+        "セネト"
+      ],
       "section": "S",
       "ids": [
         {
@@ -5662,7 +5690,7 @@
       "extra": "",
       "missing": false,
       "pinned": true,
-      "addedAt": 1789342849321
+      "addedAt": 1789360932806
     },
     {
       "name": "淘气仙星",
@@ -7431,22 +7459,31 @@
       "addedAt": 1789346333622
     },
     {
+      "id": "g347",
       "name": "异解△",
-      "aliases": [],
+      "aliases": [
+        "異解△"
+      ],
+      "tags": [
+        "異解△"
+      ],
       "section": "Y",
       "ids": [
         {
           "num": "797742136",
           "note": "",
           "dead": false
+        },
+        {
+          "num": "1060040413",
+          "note": "",
+          "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g347",
-      "tags": [],
-      "pinned": false
+      "pinned": true,
+      "addedAt": 1789360869947
     },
     {
       "name": "自奏圣乐/自鸣天琴",
@@ -8890,5 +8927,5 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T03:10:05.429Z"
+  "publishedAt": "2026-09-14T04:49:30.759Z"
 }
