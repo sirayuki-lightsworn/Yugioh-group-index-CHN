@@ -1915,8 +1915,10 @@
       "pinned": false
     },
     {
+      "id": "g86",
       "name": "艮鬼",
       "aliases": [],
+      "tags": [],
       "section": "G",
       "ids": [
         {
@@ -1926,16 +1928,19 @@
         },
         {
           "num": "870237937",
-          "note": "二群",
+          "note": "",
+          "dead": false
+        },
+        {
+          "num": "869917447",
+          "note": "",
           "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g86",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789351412894
     },
     {
       "name": "幻变骚灵",
@@ -8895,5 +8900,5 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T00:41:17.432Z"
+  "publishedAt": "2026-09-14T02:03:42.648Z"
 }
