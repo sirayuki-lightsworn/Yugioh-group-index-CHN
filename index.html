@@ -55,6 +55,7 @@ body.admin .row{grid-template-columns:minmax(140px,1fr) minmax(160px,1.2fr) minm
 body.admin .tags-cell{display:block}
 .sec-h{margin:22px 0 8px;padding-top:8px;font-size:22px;color:var(--gold);border-top:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#223;color:#fff;padding:8px 14px;border-radius:999px;display:none;z-index:50;border:1px solid var(--gold)}
+.toast.ok{background:#067647;border-color:#7dcea0;color:#fff;font-weight:700;padding:12px 18px}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:40;align-items:center;justify-content:center;padding:16px}
 .modal{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px;width:min(560px,100%);max-height:90vh;overflow:auto}
 .form-row{margin:8px 0}
@@ -132,6 +133,15 @@ body.admin .row-ops{display:inline-flex}
 .icon-mini.danger:hover{background:#3a1818;color:#ff8a8a}
 html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b42318}
 
+
+.fold-head{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;margin:0 0 8px}
+.fold-head h2{margin:0;flex:1}
+.fold-tri{width:22px;height:22px;border:0;background:transparent;color:var(--gold2);cursor:pointer;font-size:12px;line-height:22px;padding:0;transform:rotate(90deg)}
+.card.folded .fold-tri{transform:rotate(0deg)}
+.card.folded .fold-body{display:none}
+#archiveBtn{display:none}
+#archiveBtn.show{display:inline-flex}
+
 </style>
 </head>
 <body>
@@ -144,6 +154,9 @@ html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b4231
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       </button>
       <button class="icon-btn" id="themeBtn" title="白天/夜间" onclick="toggleTheme()">🌙</button>
+      <a class="icon-btn" id="archiveBtn" title="下载原始索引存档" href="#" download>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/></svg>
+      </a>
     </div>
     <div class="sub" id="pageSub"></div>
     <button class="pencil" title="编辑副标题" onclick="openFieldEditor('subtitle')">✎ 编辑这句说明</button>
@@ -163,6 +176,7 @@ html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b4231
       <button class="btn" onclick="toggleDead()">隐藏/显示已失效群号</button>
       <button class="btn admin-only" id="queueBtn" onclick="openQueue()">审核队列<span class="badge" id="pendBadge"></span></button>
       <button class="btn btn-gold admin-only" onclick="openEditor(null)">直接新增</button>
+      <button class="btn admin-only" onclick="openArchiveUpload()">上传存档文档</button>
       <button class="btn admin-only" onclick="openSiteSettings()">发布设置</button>
       <button class="btn admin-only" onclick="openCopyEditor()">编辑投稿文案</button><button class="btn admin-only" onclick="openPassword()">修改密码</button>
       <button class="btn admin-only" onclick="publishToGitHub()">发布到网站</button>
@@ -170,12 +184,12 @@ html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b4231
     </div>
   </header>
   <div class="card" id="aboutCard"></div>
+  <div class="card pending-card admin-only" id="queueHint" style="display:none"></div>
+  <div class="card featured" id="featuredCard"></div>
   <div class="search-card">
     <label for="q">搜索卡组 / 别名 / 群号 / 标签</label>
     <input id="q" type="search" placeholder="例如：废二、古生物、闪刀姬" oninput="render()">
   </div>
-  <div class="card pending-card admin-only" id="queueHint" style="display:none"></div>
-  <div class="card featured" id="featuredCard"></div>
   <div class="letters" id="letters"></div>
   <div class="hint"><span class="count" id="count"></span> · 失效群号不提供复制</div>
   <div id="list"></div>
@@ -187,7 +201,7 @@ html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b4231
   </footer>
 </div>
 <div class="toast" id="toast"></div>
-<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
 <script>
 var SECTIONS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["其他"]);
 var ADMIN_KEY = "ygoOfficialAdminHash_v1";
@@ -207,6 +221,24 @@ function lcUrl(path){
 }
 
 var THEME_KEY="ygoOfficialTheme_v1";
+var FOLD_KEY="ygoOfficialFold_v1";
+function foldState(){
+  try{return JSON.parse(localStorage.getItem(FOLD_KEY)||"{}")}catch(e){return {}}
+}
+function isFolded(key){return !!foldState()[key]}
+function toggleFold(key){
+  var s=foldState();
+  s[key]=!s[key];
+  localStorage.setItem(FOLD_KEY,JSON.stringify(s));
+  applyFolds();
+}
+function applyFolds(){
+  var about=document.getElementById("aboutCard");
+  var feat=document.getElementById("featuredCard");
+  if(about) about.classList.toggle("folded", isFolded("about"));
+  if(feat) feat.classList.toggle("folded", isFolded("pin"));
+}
+
 function applyTheme(th){
   document.documentElement.setAttribute("data-theme", th==="light"?"light":"dark");
   var b=document.getElementById("themeBtn");
@@ -221,7 +253,15 @@ function toggleTheme(){
 applyTheme(localStorage.getItem(THEME_KEY)||"dark");
 
 
-function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(function(){t.style.display="none"},1800)}
+function toast(msg, ok){
+  var t=document.getElementById("toast");
+  t.className="toast"+(ok?" ok":"");
+  t.textContent=ok?("✅ 提交成功"):msg;
+  if(!ok) t.textContent=msg;
+  t.style.display="block";
+  setTimeout(function(){t.style.display="none";t.className="toast"}, ok?2200:1800);
+}
+function toastOk(){toast("", true)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
 function hashPw(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16)}
 function today(){var d=new Date();return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear()}
@@ -299,12 +339,14 @@ function render(){
   document.getElementById("lastUpdate").textContent="最后更新于："+(DATA.updated||"")+live+(DIRTY?"（有未发布的本地修改）":"");
   document.getElementById("footerNote").textContent=DATA.footerNote||"";
   document.getElementById("linkList").innerHTML=(DATA.links||[]).map(function(L){return "<li><a href='"+esc(L.url)+"' target='_blank' rel='noopener'>"+esc(L.label)+"</a></li>"}).join("");
-  document.getElementById("aboutCard").innerHTML="<h2>说明 <button class='pencil' onclick=\"openFieldEditor('about')\">✎</button></h2><div class='note'>"+esc(ensureAboutFeedback(DATA))+"</div>";
+  document.getElementById("aboutCard").innerHTML="<div class='fold-head' onclick=\"toggleFold('about')\"><button type='button' class='fold-tri'>▶</button><h2>说明</h2><button class='pencil' onclick=\"event.stopPropagation();openFieldEditor('about')\">✎</button></div><div class='fold-body note'>"+esc(ensureAboutFeedback(DATA))+"</div>";
   var q=(document.getElementById("q").value||"").trim().toLowerCase();
   var pinned=DATA.groups.filter(function(g){return g.pinned&&matches(g,q)});
   var feat=document.getElementById("featuredCard");
   feat.style.display=(!q&&!pinned.length)?"":(pinned.length?"":"none");
-  feat.innerHTML=pinned.length?"<h2>置顶</h2>"+pinned.map(renderRow).join(""):"<h2>置顶</h2><div class='note'>暂无置顶。</div>";
+  feat.innerHTML="<div class='fold-head' onclick=\"toggleFold('pin')\"><button type='button' class='fold-tri'>▶</button><h2>置顶</h2></div><div class='fold-body'>"+(pinned.length?pinned.map(renderRow).join(""):"<div class='note'>暂无置顶。</div>")+"</div>";
+  applyFolds();
+  updateArchiveBtn();
   document.getElementById("letters").innerHTML=SECTIONS.map(function(L){return '<a href="#sec-'+L+'">'+L+"</a>"}).join("");
   var shown=0,html="";
   SECTIONS.forEach(function(L){
@@ -430,7 +472,7 @@ function openSubmit(){
   openModal("<h3>"+esc(c.title)+" "+editBtn+"</h3><p class='note'>"+esc(c.hint)+"</p>"+
     "<input type='hidden' id='sKind' value='add'>"+
     "<div class='form-row'><label>内容 *</label><textarea id='sBody' rows='8'></textarea></div>"+
-    "<div class='form-row'><label>联系方式（选填，QQ / 邮箱 / 其他）</label><input id='sContact' placeholder='方便通知你审核结果'></div>"+
+    "<div class='form-row'><label>联系方式（选填，QQ / 邮箱 / 其他）</label><input id='sContact' placeholder='若提交bug或反馈，管理员可能与您联系以了解详细信息'></div>"+
     "<div class='toolbar'><button class='btn btn-add' onclick='doSubmit()'>提交</button><button class='btn' onclick='closeModal()'>取消</button></div>"+
     "<p class='note' id='sMsg' style='margin-top:10px'></p>");
 }
@@ -464,10 +506,8 @@ async function doSubmit(){
       });
       var data=await res.json();
       if(res.ok){
-        msg.textContent=contact
-          ? "已提交。你留下了联系方式，审核后管理员可以联系你。"
-          : "已提交。若想收到「已收录」或感谢，下次可留下 QQ / 邮箱。";
-        toast("已发送");
+        closeModal();
+        toastOk();
         return;
       }
       msg.textContent="发送失败："+(data.message||res.status);
@@ -481,7 +521,7 @@ async function doSubmit(){
         body:JSON.stringify({kind:kind,body:body,contact:contact,status:"pending",name:body.slice(0,20)})
       });
       var data2=await res2.json();
-      if(res2.ok && data2.objectId){msg.textContent="已提交到后台。";toast("提交成功");return}
+      if(res2.ok && data2.objectId){closeModal();toastOk();return}
       msg.textContent="提交失败："+(data2.error||res2.status);
     }catch(e){msg.textContent="网络失败。"}
     return;
@@ -582,6 +622,62 @@ function saveMeta(){
   DATA.footerNote=document.getElementById("mFoot").value;
   DATA.links=document.getElementById("mLinks").value.split(/\n+/).map(function(line){var p=line.split("|");if(p.length<2)return null;return {label:p[0].trim(),url:p.slice(1).join("|").trim()}}).filter(Boolean);
   DATA.updated=today();markDirty();closeModal();render();toast("已保存，请发布到网站");
+}
+
+
+function updateArchiveBtn(){
+  var a=document.getElementById("archiveBtn");
+  if(!a)return;
+  var file=DATA&&DATA.archive&&DATA.archive.file;
+  if(!file){a.classList.remove("show");a.removeAttribute("href");return}
+  a.classList.add("show");
+  a.href=file;
+  a.setAttribute("download", file.split("/").pop());
+  a.title="下载原始索引存档"+(DATA.archive.updated?("（"+DATA.archive.updated+"）"):"");
+}
+function openArchiveUpload(){
+  var cur=DATA.archive&&DATA.archive.file?("当前存档："+DATA.archive.file):"还没有上传过存档。";
+  openModal("<h3>上传原始索引文档</h3><p class='note'>"+esc(cur)+"<br>支持 Word / PDF / 文本。上传后会放到网站目录，标题旁出现下载图标。</p>"+
+    "<div class='form-row'><label>选择文件</label><input id='archFile' type='file' accept='.doc,.docx,.pdf,.txt,.md'></div>"+
+    "<div class='toolbar'><button class='btn btn-gold' onclick='uploadArchiveFile()'>上传并发布</button><button class='btn' onclick='closeModal()'>取消</button></div>");
+}
+async function uploadArchiveFile(){
+  var inp=document.getElementById("archFile");
+  if(!inp||!inp.files||!inp.files[0]){toast("请先选择文件");return}
+  var file=inp.files[0];
+  if(file.size>20*1024*1024){toast("文件太大（请小于 20MB）");return}
+  var tok=localStorage.getItem(TOKEN_KEY);
+  var gh=DATA.github||{};
+  if(!tok||!gh.owner||!gh.repo){toast("请先在发布设置里填写 Token");return}
+  if(location.protocol==="file:"){toast("请到线上页上传");return}
+  var safe=file.name.replace(/[^\w.\u4e00-\u9fff-]+/g,"_");
+  if(!safe) safe="archive.docx";
+  var path="archive/"+safe;
+  toast("正在上传存档…");
+  var buf=await file.arrayBuffer();
+  var bytes=new Uint8Array(buf), bin="", i;
+  for(i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]);
+  var b64=btoa(bin);
+  var headers={Authorization:"Bearer "+tok.trim(),Accept:"application/vnd.github+json","User-Agent":"ygo-index","X-GitHub-Api-Version":"2022-11-28"};
+  try{
+    var meta=await fetch("https://api.github.com/repos/"+gh.owner+"/"+gh.repo+"/contents/"+path,{headers:headers});
+    var sha=null;
+    if(meta.ok){var mj=await meta.json();sha=mj.sha}
+    var put=await fetch("https://api.github.com/repos/"+gh.owner+"/"+gh.repo+"/contents/"+path,{
+      method:"PUT",
+      headers:Object.assign({"Content-Type":"application/json"},headers),
+      body:JSON.stringify({message:"upload archive "+safe,content:b64,sha:sha})
+    });
+    var pj=await put.json().catch(function(){return {}});
+    if(!put.ok){toast("上传失败："+(pj.message||put.status));return}
+    DATA.archive={file:path,name:safe,updated:today(),size:file.size};
+    DATA.updated=today();
+    closeModal();
+    toast("存档已上传，接着发布页面数据");
+    updateArchiveBtn();
+    markDirty();
+    await publishToGitHub();
+  }catch(e){toast("上传失败："+(e.message||e))}
 }
 
 function openSiteSettings(){
