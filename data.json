@@ -114,9 +114,17 @@
       "addedAt": 1789360975234
     },
     {
-      "name": "艾克佐迪亚（老埃）",
+      "id": "g3",
+      "name": "艾克佐迪亚",
       "aliases": [
-        "老埃"
+        "老埃",
+        "エクゾディア",
+        "Exodia"
+      ],
+      "tags": [
+        "老埃",
+        "エクゾディア",
+        "Exodia"
       ],
       "section": "A",
       "ids": [
@@ -133,12 +141,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g3",
-      "tags": [
-        "老埃"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361661066
     },
     {
       "id": "g4",
@@ -192,8 +196,14 @@
       "pinned": false
     },
     {
-      "name": "ARG☆S",
-      "aliases": [],
+      "id": "g6",
+      "name": "阿尔戈☆群星",
+      "aliases": [
+        "ARG☆S"
+      ],
+      "tags": [
+        "ARG☆S"
+      ],
       "section": "A",
       "ids": [
         {
@@ -204,10 +214,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g6",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361713219
     },
     {
       "name": "不知火",
@@ -310,8 +318,12 @@
       "pinned": false
     },
     {
-      "name": "不死世界（不死均）",
+      "id": "g12",
+      "name": "不死世界",
       "aliases": [
+        "不死均"
+      ],
+      "tags": [
         "不死均"
       ],
       "section": "B",
@@ -324,12 +336,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g12",
-      "tags": [
-        "不死均"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361726628
     },
     {
       "name": "宝石骑士",
@@ -350,8 +358,12 @@
       "pinned": false
     },
     {
-      "name": "伯吉斯异兽（古生物）",
+      "id": "g14",
+      "name": "伯吉斯异兽",
       "aliases": [
+        "古生物"
+      ],
+      "tags": [
         "古生物"
       ],
       "section": "B",
@@ -364,12 +376,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g14",
-      "tags": [
-        "古生物"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361732966
     },
     {
       "name": "北极天熊",
@@ -395,33 +403,30 @@
       "pinned": false
     },
     {
+      "id": "g16",
       "name": "变形斗士",
       "aliases": [],
+      "tags": [],
       "section": "B",
       "ids": [
         {
           "num": "703727884",
-          "note": "新群",
+          "note": "",
           "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": true,
-      "id": "g16",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361742065
     },
     {
+      "id": "g17",
       "name": "捕食植物",
       "aliases": [],
+      "tags": [],
       "section": "B",
       "ids": [
-        {
-          "num": "206568519",
-          "note": "已解散",
-          "dead": true
-        },
         {
           "num": "914927276",
           "note": "",
@@ -430,18 +435,27 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": true,
-      "id": "g17",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361748541
     },
     {
-      "name": "报社卡组/Metabeat（辉夜坏兽、次元系、雷王滑板）",
+      "id": "g18",
+      "name": "报社卡组/Metabeat",
       "aliases": [
-        "Metabeat（辉夜坏兽、次元系、雷王滑板）",
+        "Metabeat",
         "辉夜坏兽",
         "次元系",
-        "雷王滑板"
+        "雷王滑板",
+        "报社",
+        "报社"
+      ],
+      "tags": [
+        "Metabeat",
+        "辉夜坏兽",
+        "次元系",
+        "雷王滑板",
+        "报社",
+        "报社"
       ],
       "section": "B",
       "ids": [
@@ -453,15 +467,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g18",
-      "tags": [
-        "Metabeat（辉夜坏兽、次元系、雷王滑板）",
-        "辉夜坏兽",
-        "次元系",
-        "雷王滑板"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361779853
     },
     {
       "name": "冰水",
@@ -482,8 +489,13 @@
       "pinned": false
     },
     {
-      "name": "白银城（拉比林斯、迷宫）",
+      "id": "g20",
+      "name": "白银城",
       "aliases": [
+        "拉比林斯",
+        "迷宫"
+      ],
+      "tags": [
         "拉比林斯",
         "迷宫"
       ],
@@ -501,19 +513,14 @@
         },
         {
           "num": "601750400",
-          "note": "新大群",
+          "note": "",
           "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g20",
-      "tags": [
-        "拉比林斯",
-        "迷宫"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361789928
     },
     {
       "name": "霸王门/霸王眷龙/扎克",
@@ -609,8 +616,12 @@
       "pinned": false
     },
     {
-      "name": "珀耳修斯/反击天使",
+      "id": "g25",
+      "name": "珀耳修斯",
       "aliases": [
+        "反击天使"
+      ],
+      "tags": [
         "反击天使"
       ],
       "section": "B",
@@ -623,12 +634,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g25",
-      "tags": [
-        "反击天使"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361798262
     },
     {
       "name": "白森林",
@@ -755,8 +762,12 @@
       "pinned": false
     },
     {
-      "name": "超级运动员（U.A.）",
+      "id": "g31",
+      "name": "超级运动员",
       "aliases": [
+        "U.A."
+      ],
+      "tags": [
         "U.A."
       ],
       "section": "C",
@@ -769,28 +780,16 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g31",
-      "tags": [
-        "U.A."
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361815785
     },
     {
+      "id": "g32",
       "name": "虫惑魔",
       "aliases": [],
+      "tags": [],
       "section": "C",
       "ids": [
-        {
-          "num": "125502182",
-          "note": "炸了",
-          "dead": false
-        },
-        {
-          "num": "236202615",
-          "note": "貌似炸了",
-          "dead": false
-        },
         {
           "num": "612517686",
           "note": "",
@@ -809,23 +808,20 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g32",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361823205
     },
     {
+      "id": "g33",
       "name": "超级量子（超量士）",
       "aliases": [
         "超量士"
       ],
+      "tags": [
+        "超量士"
+      ],
       "section": "C",
       "ids": [
-        {
-          "num": "534642022",
-          "note": "已解散",
-          "dead": true
-        },
         {
           "num": "678320732",
           "note": "",
@@ -839,12 +835,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g33",
-      "tags": [
-        "超量士"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361829123
     },
     {
       "name": "磁石战士",
@@ -5570,9 +5562,17 @@
       "pinned": false
     },
     {
-      "name": "巳剑/御剑",
+      "id": "g257",
+      "name": "巳剑",
       "aliases": [
-        "御剑"
+        "御剑",
+        "巳剣",
+        "Mitsurugi"
+      ],
+      "tags": [
+        "御剑",
+        "巳剣",
+        "Mitsurugi"
       ],
       "section": "S",
       "ids": [
@@ -5590,16 +5590,17 @@
           "num": "909933098",
           "note": "",
           "dead": false
+        },
+        {
+          "num": "950629827",
+          "note": "",
+          "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g257",
-      "tags": [
-        "御剑"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789361597771
     },
     {
       "name": "水伶女",
@@ -8918,7 +8919,7 @@
   },
   "copy": {
     "title": "添加内容",
-    "hint": "可以发新群信息，也可以反馈意见、新功能或页面问题。想收到回复请留下 QQ 或邮箱。\n*此索引为卡组群索引，暂时不接受地区群，大学群投稿，抱歉"
+    "hint": "可以发新群信息，也可以反馈意见、新功能或页面问题。想收到回复请留下 QQ 或邮箱。\n*此索引为卡组群索引，暂时不接受地区群，大学群投稿"
   },
   "notifyEmail": "lingxuanlu96@gmail.com",
   "store": {
@@ -8927,5 +8928,5 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T04:49:30.759Z"
+  "publishedAt": "2026-09-14T04:57:22.041Z"
 }
