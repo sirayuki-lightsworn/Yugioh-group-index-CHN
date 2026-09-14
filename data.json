@@ -174,11 +174,15 @@
       "addedAt": 1789361026884
     },
     {
+      "id": "g5",
       "name": "黯黑世界/恶魔娘",
       "aliases": [
         "恶魔娘"
       ],
-      "section": "A",
+      "tags": [
+        "恶魔娘"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "532919686",
@@ -188,12 +192,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g5",
-      "tags": [
-        "恶魔娘"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401784411
     },
     {
       "id": "g6",
@@ -326,7 +326,7 @@
       "tags": [
         "不死均"
       ],
-      "section": "B",
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "169912529",
@@ -337,7 +337,7 @@
       "extra": "",
       "missing": false,
       "pinned": false,
-      "addedAt": 1789361726628
+      "addedAt": 1789401793966
     },
     {
       "name": "宝石骑士",
@@ -457,7 +457,7 @@
         "报社",
         "报社"
       ],
-      "section": "B",
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "748719498",
@@ -468,7 +468,7 @@
       "extra": "",
       "missing": false,
       "pinned": false,
-      "addedAt": 1789361779853
+      "addedAt": 1789401800639
     },
     {
       "name": "冰水",
@@ -813,7 +813,7 @@
     },
     {
       "id": "g33",
-      "name": "超级量子（超量士）",
+      "name": "超级量子",
       "aliases": [
         "超量士"
       ],
@@ -836,7 +836,7 @@
       "extra": "",
       "missing": false,
       "pinned": false,
-      "addedAt": 1789361829123
+      "addedAt": 1789401816956
     },
     {
       "name": "磁石战士",
@@ -862,8 +862,12 @@
       "pinned": false
     },
     {
-      "name": "齿轮齿轮/ギアギア",
+      "id": "g35",
+      "name": "齿轮齿轮",
       "aliases": [
+        "ギアギア"
+      ],
+      "tags": [
         "ギアギア"
       ],
       "section": "C",
@@ -876,12 +880,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g35",
-      "tags": [
-        "ギアギア"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401812640
     },
     {
       "name": "春化精",
@@ -1078,9 +1078,11 @@
       "pinned": false
     },
     {
+      "id": "g46",
       "name": "带菌刺猬",
       "aliases": [],
-      "section": "D",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "163108741",
@@ -1090,10 +1092,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g46",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401835820
     },
     {
       "name": "电子化天使",
@@ -1114,8 +1114,12 @@
       "pinned": false
     },
     {
-      "name": "DD（异次元恶魔）",
+      "id": "g48",
+      "name": "DD",
       "aliases": [
+        "异次元恶魔"
+      ],
+      "tags": [
         "异次元恶魔"
       ],
       "section": "D",
@@ -1128,12 +1132,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g48",
-      "tags": [
-        "异次元恶魔"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401828571
     },
     {
       "name": "电子龙",
@@ -1159,8 +1159,12 @@
       "pinned": false
     },
     {
-      "name": "电子暗黑（里电子）",
+      "id": "g50",
+      "name": "电子暗黑",
       "aliases": [
+        "里电子"
+      ],
+      "tags": [
         "里电子"
       ],
       "section": "D",
@@ -1173,16 +1177,16 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g50",
-      "tags": [
-        "里电子"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401841792
     },
     {
-      "name": "电子界（码语拳）",
+      "id": "g51",
+      "name": "电子界",
       "aliases": [
+        "码语拳"
+      ],
+      "tags": [
         "码语拳"
       ],
       "section": "D",
@@ -1205,12 +1209,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g51",
-      "tags": [
-        "码语拳"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401848229
     },
     {
       "name": "电脑堺",
@@ -1463,11 +1463,15 @@
       "pinned": false
     },
     {
-      "name": "恶魔均（デーモン）",
+      "id": "g63",
+      "name": "恶魔均",
       "aliases": [
         "デーモン"
       ],
-      "section": "E",
+      "tags": [
+        "デーモン"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "526243260",
@@ -1477,12 +1481,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g63",
-      "tags": [
-        "デーモン"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401867651
     },
     {
       "name": "恶魔召唤",
@@ -1585,11 +1585,15 @@
       "pinned": false
     },
     {
+      "id": "g69",
       "name": "废品二重身（废二）",
       "aliases": [
         "废二"
       ],
-      "section": "F",
+      "tags": [
+        "废二"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "427968149",
@@ -1599,12 +1603,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g69",
-      "tags": [
-        "废二"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401874335
     },
     {
       "name": "复仇死灵",
@@ -2338,9 +2338,11 @@
       "pinned": false
     },
     {
+      "id": "g105",
       "name": "幻想魔族",
       "aliases": [],
-      "section": "H",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "152699563",
@@ -2355,10 +2357,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g105",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401892486
     },
     {
       "name": "荷鲁斯",
@@ -3044,8 +3044,12 @@
       "pinned": false
     },
     {
-      "name": "纠罪巧（エニアクラフト）",
+      "id": "g139",
+      "name": "纠罪巧",
       "aliases": [
+        "エニアクラフト"
+      ],
+      "tags": [
         "エニアクラフト"
       ],
       "section": "J",
@@ -3073,12 +3077,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g139",
-      "tags": [
-        "エニアクラフト"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401914253
     },
     {
       "name": "空牙团",
@@ -4397,11 +4397,15 @@
       "pinned": false
     },
     {
+      "id": "g198",
       "name": "泥头车（机甲部队FTK）",
       "aliases": [
         "机甲部队FTK"
       ],
-      "section": "N",
+      "tags": [
+        "机甲部队FTK"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "736942469",
@@ -4411,12 +4415,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g198",
-      "tags": [
-        "机甲部队FTK"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789401946338
     },
     {
       "name": "女武神",
@@ -7966,9 +7966,11 @@
       "pinned": false
     },
     {
+      "id": "g370",
       "name": "念动力讨论群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "497549620",
@@ -7983,15 +7985,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g370",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402040908
     },
     {
+      "id": "g371",
       "name": "爬虫族讨论群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "656328286",
@@ -8001,15 +8003,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g371",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402045243
     },
     {
+      "id": "g372",
       "name": "昆虫族讨论群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "1055657036",
@@ -8019,15 +8021,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g372",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402049623
     },
     {
+      "id": "g373",
       "name": "魔法师族",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "912743166",
@@ -8037,18 +8039,21 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g373",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402053455
     },
     {
+      "id": "g374",
       "name": "地均/地地地/多种地属性均群",
       "aliases": [
         "地地地",
         "多种地属性均群"
       ],
-      "section": "其他",
+      "tags": [
+        "地地地",
+        "多种地属性均群"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "725636258",
@@ -8058,22 +8063,23 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g374",
-      "tags": [
-        "地地地",
-        "多种地属性均群"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402057352
     },
     {
+      "id": "g375",
       "name": "各种游戏neta（沙罗曼蛇/巨大战舰）",
       "aliases": [
         "巨大战舰）",
         "沙罗曼蛇",
         "巨大战舰"
       ],
-      "section": "其他",
+      "tags": [
+        "巨大战舰）",
+        "沙罗曼蛇",
+        "巨大战舰"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "884807929",
@@ -8083,19 +8089,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g375",
-      "tags": [
-        "巨大战舰）",
-        "沙罗曼蛇",
-        "巨大战舰"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402061794
     },
     {
+      "id": "g376",
       "name": "世坏南桐群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "824559213",
@@ -8105,12 +8107,11 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g376",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402065564
     },
     {
+      "id": "g377",
       "name": "幸运卡组（掷硬币/骰子/猜拳相关）",
       "aliases": [
         "骰子",
@@ -8118,7 +8119,13 @@
         "掷硬币",
         "猜拳相关"
       ],
-      "section": "其他",
+      "tags": [
+        "骰子",
+        "猜拳相关）",
+        "掷硬币",
+        "猜拳相关"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "120381890",
@@ -8128,20 +8135,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g377",
-      "tags": [
-        "骰子",
-        "猜拳相关）",
-        "掷硬币",
-        "猜拳相关"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402071097
     },
     {
+      "id": "g378",
       "name": "陷阱怪兽",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "963937670",
@@ -8151,17 +8153,19 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g378",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402074909
     },
     {
+      "id": "g379",
       "name": "伊西斯/现冥",
       "aliases": [
         "现冥"
       ],
-      "section": "其他",
+      "tags": [
+        "现冥"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "275042051",
@@ -8171,17 +8175,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g379",
-      "tags": [
-        "现冥"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402078820
     },
     {
+      "id": "g380",
       "name": "王家神殿",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "952607128",
@@ -8191,17 +8193,19 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g380",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402084560
     },
     {
+      "id": "g381",
       "name": "天地星（霸胜星）",
       "aliases": [
         "霸胜星"
       ],
-      "section": "其他",
+      "tags": [
+        "霸胜星"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "1053498689",
@@ -8211,14 +8215,11 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g381",
-      "tags": [
-        "霸胜星"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402088540
     },
     {
+      "id": "g382",
       "name": "哥德温（地缚神/日月龙/神官）",
       "aliases": [
         "日月龙",
@@ -8226,7 +8227,13 @@
         "地缚神",
         "神官"
       ],
-      "section": "其他",
+      "tags": [
+        "日月龙",
+        "神官）",
+        "地缚神",
+        "神官"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "766673996",
@@ -8236,20 +8243,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g382",
-      "tags": [
-        "日月龙",
-        "神官）",
-        "地缚神",
-        "神官"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402092466
     },
     {
+      "id": "g383",
       "name": "名推怪兽门卡组",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "1102341003",
@@ -8259,15 +8261,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g383",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402096064
     },
     {
+      "id": "g384",
       "name": "混沌大群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "1094387932",
@@ -8277,18 +8279,21 @@
       ],
       "extra": "包含以下 上古混沌均（开辟帝龙）、混沌仪式（混沌场）、混沌仪式（混沌形态）、光暗属性",
       "missing": false,
-      "nameStruck": false,
-      "id": "g384",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402099823
     },
     {
+      "id": "g385",
       "name": "混沌同调（双翼、女神）",
       "aliases": [
         "双翼",
         "女神"
       ],
-      "section": "其他",
+      "tags": [
+        "双翼",
+        "女神"
+      ],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "721939760",
@@ -8298,18 +8303,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g385",
-      "tags": [
-        "双翼",
-        "女神"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402104991
     },
     {
+      "id": "g386",
       "name": "盖亚+龙骑士+超战士",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "非字段卡组/均卡",
       "ids": [
         {
           "num": "945672746",
@@ -8319,15 +8321,61 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g386",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402108599
     },
     {
+      "id": "g1789363638123",
+      "name": "睡醒一杯！",
+      "aliases": [
+        "WAKE CUP!"
+      ],
+      "tags": [
+        "WAKE CUP!"
+      ],
+      "section": "非字段卡组/均卡",
+      "ids": [
+        {
+          "num": "2156065365",
+          "note": "",
+          "dead": false
+        }
+      ],
+      "extra": "",
+      "missing": false,
+      "pinned": false,
+      "addedAt": 1789402113169
+    },
+    {
+      "id": "g1789400642382",
+      "name": "死灵之颜",
+      "aliases": [
+        "死人脸",
+        "除外均"
+      ],
+      "tags": [
+        "死人脸",
+        "除外均"
+      ],
+      "section": "非字段卡组/均卡",
+      "ids": [
+        {
+          "num": "1037242223",
+          "note": "",
+          "dead": false
+        }
+      ],
+      "extra": "",
+      "missing": false,
+      "pinned": false,
+      "addedAt": 1789402116382
+    },
+    {
+      "id": "g387",
       "name": "Duel Terminal故事群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "剧情/动画",
       "ids": [
         {
           "num": "528345743",
@@ -8337,15 +8385,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g387",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402171819
     },
     {
+      "id": "g388",
       "name": "教导世界观故事群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "剧情/动画",
       "ids": [
         {
           "num": "299024582",
@@ -8355,15 +8403,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g388",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402175590
     },
     {
+      "id": "g389",
       "name": "Vrains群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "剧情/动画",
       "ids": [
         {
           "num": "276017451",
@@ -8373,15 +8421,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g389",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402160260
     },
     {
+      "id": "g390",
       "name": "Arc-V群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "剧情/动画",
       "ids": [
         {
           "num": "679881022",
@@ -8391,15 +8439,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g390",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402155671
     },
     {
+      "id": "g391",
       "name": "Zexal群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "剧情/动画",
       "ids": [
         {
           "num": "546476069",
@@ -8409,15 +8457,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g391",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402151796
     },
     {
+      "id": "g392",
       "name": "DM群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "剧情/动画",
       "ids": [
         {
           "num": "229182542",
@@ -8427,20 +8475,20 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g392",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402135592
     },
     {
+      "id": "g393",
       "name": "Gx群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "剧情/动画",
       "ids": [
         {
           "num": "942823241",
           "note": "疑似似了",
-          "dead": false
+          "dead": true
         },
         {
           "num": "1097756233",
@@ -8450,15 +8498,15 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g393",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402142070
     },
     {
+      "id": "g394",
       "name": "5ds群",
       "aliases": [],
-      "section": "其他",
+      "tags": [],
+      "section": "剧情/动画",
       "ids": [
         {
           "num": "749263290",
@@ -8468,10 +8516,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g394",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789402145860
     },
     {
       "name": "知乎游戏王交流群",
@@ -8820,6 +8866,24 @@
       "pinned": false
     },
     {
+      "id": "g1789400693817",
+      "name": "408模式",
+      "aliases": [],
+      "tags": [],
+      "section": "其他",
+      "ids": [
+        {
+          "num": "708942347",
+          "note": "2群",
+          "dead": false
+        }
+      ],
+      "extra": "",
+      "missing": false,
+      "pinned": false,
+      "addedAt": 1789400721166
+    },
+    {
       "id": "g414",
       "name": "RD线上决斗群",
       "aliases": [],
@@ -8922,70 +8986,6 @@
       "missing": false,
       "pinned": true,
       "addedAt": 1789346163732
-    },
-    {
-      "id": "g1789363638123",
-      "name": "睡醒一杯！",
-      "aliases": [
-        "WAKE CUP!"
-      ],
-      "tags": [
-        "WAKE CUP!"
-      ],
-      "section": "其他",
-      "ids": [
-        {
-          "num": "2156065365",
-          "note": "",
-          "dead": false
-        }
-      ],
-      "extra": "",
-      "missing": false,
-      "pinned": false,
-      "addedAt": 1789363689581
-    },
-    {
-      "id": "g1789400642382",
-      "name": "死灵之颜",
-      "aliases": [
-        "死人脸",
-        "除外均"
-      ],
-      "tags": [
-        "死人脸",
-        "除外均"
-      ],
-      "section": "其他",
-      "ids": [
-        {
-          "num": "1037242223",
-          "note": "",
-          "dead": false
-        }
-      ],
-      "extra": "",
-      "missing": false,
-      "pinned": false,
-      "addedAt": 1789400669365
-    },
-    {
-      "id": "g1789400693817",
-      "name": "408模式",
-      "aliases": [],
-      "tags": [],
-      "section": "其他",
-      "ids": [
-        {
-          "num": "708942347",
-          "note": "2群",
-          "dead": false
-        }
-      ],
-      "extra": "",
-      "missing": false,
-      "pinned": false,
-      "addedAt": 1789400721166
     }
   ],
   "github": {
@@ -9004,5 +9004,36 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T15:45:23.562Z"
+  "publishedAt": "2026-09-14T16:10:29.652Z",
+  "sections": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "非字段卡组/均卡",
+    "剧情/动画",
+    "其他"
+  ]
 }
