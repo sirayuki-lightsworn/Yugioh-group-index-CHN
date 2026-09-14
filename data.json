@@ -8813,12 +8813,14 @@
       "pinned": false
     },
     {
+      "id": "g414",
       "name": "RD线上决斗群",
       "aliases": [],
+      "tags": [],
       "section": "其他",
       "ids": [
         {
-          "num": "1079768857",
+          "num": "766975530",
           "note": "1群",
           "dead": false
         },
@@ -8826,14 +8828,17 @@
           "num": "658141024",
           "note": "2群",
           "dead": false
+        },
+        {
+          "num": "1079768857",
+          "note": "4群，无法搜索",
+          "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g414",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789368151870
     },
     {
       "name": "视频打牌群",
@@ -8950,5 +8955,5 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T05:29:22.635Z"
+  "publishedAt": "2026-09-14T06:42:40.596Z"
 }
