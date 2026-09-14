@@ -193,6 +193,19 @@ var SECTIONS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["其他"]);
 var ADMIN_KEY = "ygoOfficialAdminHash_v1";
 var TOKEN_KEY = "ygoOfficialPublishToken_v1";
 var isAdmin = false, hideDead = false, DATA = null, DIRTY = false;
+function storeReady(){
+  var s=DATA && DATA.store;
+  return !!(s && s.appId && s.appKey && s.server);
+}
+function lcHeaders(){
+  var s=(DATA&&DATA.store)||{};
+  return {"X-LC-Id":s.appId||"","X-LC-Key":s.appKey||"","Content-Type":"application/json"};
+}
+function lcUrl(path){
+  var s=(DATA&&DATA.store)||{};
+  return String(s.server||"").replace(/\/$/,"")+"/1.1"+path;
+}
+
 var THEME_KEY="ygoOfficialTheme_v1";
 function applyTheme(th){
   document.documentElement.setAttribute("data-theme", th==="light"?"light":"dark");
