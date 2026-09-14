@@ -8888,12 +8888,12 @@
     "title": "添加内容",
     "hint": "可以发新群信息，也可以反馈意见、新功能或页面问题。想收到回复请留下 QQ 或邮箱。"
   },
-  "notifyEmail": "",
+  "notifyEmail": "lingxuanlu96@gmail.com",
   "store": {
     "type": "leancloud",
     "server": "",
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-14T00:39:09.895Z"
+  "publishedAt": "2026-09-14T00:41:17.432Z"
 }
