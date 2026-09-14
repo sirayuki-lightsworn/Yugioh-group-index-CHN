@@ -131,6 +131,11 @@ body.admin .row-ops{display:inline-flex}
 .icon-mini:hover{border-color:var(--gold);color:var(--gold2)}
 .icon-mini.danger{color:var(--danger);border-color:#8a4040}
 .icon-mini.danger:hover{background:#3a1818;color:#ff8a8a}
+.drag-handle{cursor:grab;letter-spacing:-1px;font-size:15px;line-height:1;color:var(--muted)}
+.drag-handle:active{cursor:grabbing}
+.row.dragging{opacity:.45}
+.row.drag-over{outline:2px dashed var(--gold)}
+body.admin .row{cursor:default}
 html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b42318}
 
 
@@ -176,6 +181,7 @@ html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b4231
       <button class="btn" onclick="toggleDead()">隐藏/显示已失效群号</button>
       <button class="btn admin-only" id="queueBtn" onclick="openQueue()">审核队列<span class="badge" id="pendBadge"></span></button>
       <button class="btn btn-gold admin-only" onclick="openEditor(null)">直接新增</button>
+      <button class="btn admin-only" onclick="openSectionManager()">分区管理</button>
       <button class="btn admin-only" onclick="openArchiveUpload()">上传存档文档</button>
       <button class="btn admin-only" onclick="openSiteSettings()">发布设置</button>
       <button class="btn admin-only" onclick="openCopyEditor()">编辑投稿文案</button><button class="btn admin-only" onclick="openPassword()">修改密码</button>
@@ -203,7 +209,12 @@ html[data-theme="light"] .icon-mini.danger:hover{background:#fde8e8;color:#b4231
 <div class="toast" id="toast"></div>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
 <script>
-var SECTIONS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["其他"]);
+var DEFAULT_SECTIONS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["其他"]);
+function sectionList(){
+  if(DATA && DATA.sections && DATA.sections.length) return DATA.sections.slice();
+  return DEFAULT_SECTIONS.slice();
+}
+
 var ADMIN_KEY = "ygoOfficialAdminHash_v1";
 var TOKEN_KEY = "ygoOfficialPublishToken_v1";
 var isAdmin = false, hideDead = false, DATA = null, DIRTY = false;
@@ -291,6 +302,7 @@ async function loadData(){
   if(!res.ok) throw new Error("data.json 加载失败");
   DATA=await res.json();
   if(!DATA.groups) DATA.groups=[];
+  if(!DATA.sections || !DATA.sections.length) DATA.sections=DEFAULT_SECTIONS.slice();
   if(!DATA.github) DATA.github={owner:"sirayuki-lightsworn",repo:"Yugioh-group-index-CHN",submitProxy:""};
   DATA.groups.forEach(function(g){if(!g.tags)g.tags=(g.aliases||[]).slice();if(g.pinned==null)g.pinned=!!g.featured});
   if(!DATA.pending) DATA.pending=[];
@@ -314,14 +326,15 @@ function renderRow(g){
   var tags='<div class="tags-cell">'+(g.tags&&g.tags.length?esc(g.tags.join("，")):"无标签")+"</div>";
   var admin="";
   if(isAdmin){
-    admin='<div class="row-ops"><label class="pinbox"><input type="checkbox"'+(g.pinned?" checked":"")+' onchange="togglePin(\''+g.id+'\',this.checked)">置顶</label></div>';
+    admin='<div class="row-ops"><span class="icon-mini drag-handle" title="拖动排序" draggable="false">☰</span><label class="pinbox"><input type="checkbox"'+(g.pinned?" checked":"")+' onchange="togglePin(\''+g.id+'\',this.checked)">置顶</label></div>';
   }
   var nameOps="";
   if(isAdmin){
     nameOps=' <button class="icon-mini" title="编辑卡组条目" onclick="openEditor(\''+g.id+'\')">✎</button>'+
             ' <button class="icon-mini danger" title="删除整条卡组" onclick="deleteGroup(\''+g.id+'\')">✕</button>';
   }
-  return '<div class="row'+(allDead?" all-dead":"")+'" data-id="'+esc(g.id)+'"><div><div class="name'+(g.nameStruck?" struck":"")+'">'+esc(g.name)+nameOps+"</div>"+extra+"</div><div>"+idsHtml+"</div>"+tags+admin+"</div>";
+  var drag=isAdmin?' draggable="true" ondragstart="rowDragStart(event)" ondragend="rowDragEnd(event)" ondragover="rowDragOver(event)" ondragleave="rowDragLeave(event)" ondrop="rowDrop(event)"':'';
+  return '<div class="row'+(allDead?" all-dead":"")+'" data-id="'+esc(g.id)+'" data-sec="'+esc(g.section||"")+'"'+drag+'><div><div class="name'+(g.nameStruck?" struck":"")+'">'+esc(g.name)+nameOps+"</div>"+extra+"</div><div>"+idsHtml+"</div>"+tags+admin+"</div>";
 }
 function ensureAboutFeedback(s){
   var about=s.about||"", qq=s.feedbackQq||"", ans=s.feedbackAnswer||"";
@@ -347,9 +360,9 @@ function render(){
   feat.innerHTML="<div class='fold-head' onclick=\"toggleFold('pin')\"><button type='button' class='fold-tri'>▶</button><h2>置顶</h2></div><div class='fold-body'>"+(pinned.length?pinned.map(renderRow).join(""):"<div class='note'>暂无置顶。</div>")+"</div>";
   applyFolds();
   updateArchiveBtn();
-  document.getElementById("letters").innerHTML=SECTIONS.map(function(L){return '<a href="#sec-'+L+'">'+L+"</a>"}).join("");
+  document.getElementById("letters").innerHTML=sectionList().map(function(L){return '<a href="#sec-'+L+'">'+L+"</a>"}).join("");
   var shown=0,html="";
-  SECTIONS.forEach(function(L){
+  sectionList().forEach(function(L){
     var rows=DATA.groups.filter(function(g){return g.section===L&&matches(g,q)});
     if(!rows.length)return;
     html+='<div class="sec-h" id="sec-'+L+'">'+L+"</div>";
@@ -420,6 +433,38 @@ function logoutAdmin(){isAdmin=false;sessionStorage.removeItem("ygoAdminIcon");h
 
 function findGroup(id){for(var i=0;i<DATA.groups.length;i++) if(DATA.groups[i].id===id) return DATA.groups[i];return null}
 function togglePin(id,on){var g=findGroup(id);if(!g)return;g.pinned=!!on;DATA.updated=today();markDirty();render()}
+function rowDragStart(ev){
+  var row=ev.currentTarget;
+  ev.dataTransfer.setData("text/plain", row.getAttribute("data-id"));
+  ev.dataTransfer.effectAllowed="move";
+  row.classList.add("dragging");
+}
+function rowDragEnd(ev){ev.currentTarget.classList.remove("dragging");
+  document.querySelectorAll(".row.drag-over").forEach(function(el){el.classList.remove("drag-over")});
+}
+function rowDragOver(ev){
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect="move";
+  ev.currentTarget.classList.add("drag-over");
+}
+function rowDragLeave(ev){ev.currentTarget.classList.remove("drag-over")}
+function rowDrop(ev){
+  ev.preventDefault();
+  ev.currentTarget.classList.remove("drag-over");
+  var from=ev.dataTransfer.getData("text/plain");
+  var to=ev.currentTarget.getAttribute("data-id");
+  if(!from||!to||from===to)return;
+  var a=findGroup(from), b=findGroup(to);
+  if(!a||!b)return;
+  if((a.section||"")!==(b.section||"")){toast("只能在同一分区内拖动");return}
+  var ia=DATA.groups.indexOf(a), ib=DATA.groups.indexOf(b);
+  if(ia<0||ib<0)return;
+  DATA.groups.splice(ia,1);
+  ib=DATA.groups.indexOf(b);
+  DATA.groups.splice(ib,0,a);
+  DATA.updated=today();markDirty();render();
+}
+
 function deleteGroup(id){if(!confirm("删除这一整条卡组？"))return;DATA.groups=DATA.groups.filter(function(g){return g.id!==id});DATA.updated=today();markDirty();render();toast("已删除（尚未发布到网站）")}
 function removeOneId(gid,idx){
   var g=findGroup(gid);if(!g||!g.ids||!g.ids[idx])return;
@@ -533,6 +578,65 @@ async function doSubmit(){
 
 
 
+
+function openSectionManager(){
+  var list=sectionList();
+  var html="<h3>分区管理</h3><p class='note'>可新增分区（如「先行」「环境」）。删除分区不会删除里面的卡组，那些卡组会暂时归到「其他」。分区内各行请拖动右侧 ☰ 调整顺序。</p>";
+  list.forEach(function(name,i){
+    html+="<div class='row-ops' style='display:flex;margin:6px 0;gap:6px'>"+
+      "<span style='flex:1;line-height:28px'>"+esc(name)+"</span>"+
+      "<button class='icon-mini danger' title='删除分区' onclick='deleteSection("+i+")'>✕</button></div>";
+  });
+  html+="<div class='form-row'><label>新分区名称</label><input id='newSec' placeholder='例如：先行'></div>"+
+    "<div class='toolbar'><button class='btn btn-add' onclick='addSection()'>添加分区</button>"+
+    "<button class='btn' onclick='resetSections()'>恢复 A-Z</button>"+
+    "<button class='btn' onclick='closeModal()'>完成</button></div>";
+  openModal(html);
+}
+function persistSections(list){
+  DATA.sections=list;
+  DATA.updated=today();
+  markDirty();
+  render();
+  openSectionManager();
+}
+function moveSection(i,dir){
+  var list=sectionList();
+  var j=i+dir;
+  if(j<0||j>=list.length)return;
+  var tmp=list[i];list[i]=list[j];list[j]=tmp;
+  persistSections(list);
+}
+function addSection(){
+  var name=(document.getElementById("newSec").value||"").trim();
+  if(!name){toast("请填写分区名");return}
+  var list=sectionList();
+  if(list.indexOf(name)!==-1){toast("这个分区已存在");return}
+  var other=list.indexOf("其他");
+  if(other===-1) list.push(name);
+  else list.splice(other,0,name);
+  persistSections(list);
+  toast("已添加分区，请发布到网站");
+}
+function deleteSection(i){
+  var list=sectionList();
+  var name=list[i];
+  if(name==="其他"){toast("「其他」不能删");return}
+  if(!confirm("删除分区「"+name+"」？其中的卡组会改到「其他」。"))return;
+  list.splice(i,1);
+  if(list.indexOf("其他")===-1) list.push("其他");
+  DATA.groups.forEach(function(g){if(g.section===name)g.section="其他"});
+  persistSections(list);
+}
+function resetSections(){
+  if(!confirm("恢复为 A–Z + 其他？自定义分区名会消失，卡组里没有对应字母的会归到「其他」。"))return;
+  var def=DEFAULT_SECTIONS.slice();
+  DATA.groups.forEach(function(g){
+    if(def.indexOf(g.section)===-1) g.section="其他";
+  });
+  persistSections(def);
+}
+
 function openEditor(id){
   var g={id:"g"+Date.now(),name:"",tags:[],section:"其他",ids:[],extra:"",missing:false,pinned:false};
   if(id){var f=findGroup(id);if(!f)return;g=JSON.parse(JSON.stringify(f))}
@@ -540,7 +644,7 @@ function openEditor(id){
   openModal("<h3>"+(id?"修改":"新增")+"</h3>"+
     "<div class='form-row'><label>群名</label><input id='eName' value='"+esc(g.name)+"'></div>"+
     "<div class='form-row'><label>隐藏标签</label><input id='eTags' value='"+esc((g.tags||[]).join("，"))+"'></div>"+
-    "<div class='form-row'><label>分区</label><select id='eSec'>"+SECTIONS.map(function(L){return "<option value='"+L+"'"+(g.section===L?" selected":"")+">"+L+"</option>"}).join("")+"</select></div>"+
+    "<div class='form-row'><label>分区</label><select id='eSec'>"+sectionList().map(function(L){return "<option value='"+L+"'"+(g.section===L?" selected":"")+">"+L+"</option>"}).join("")+"</select></div>"+
     "<div class='form-row'><label>群号（一行一个，失效请加 [失效]）</label><textarea id='eIds' rows='5'>"+esc(idLines)+"</textarea></div>"+
     "<div class='form-row'><label>备注</label><input id='eExtra' value='"+esc(g.extra||"")+"'></div>"+
     "<div class='form-row'><label><input type='checkbox' id='eMissing'"+(g.missing?" checked":"")+"> 暂缺</label> <label><input type='checkbox' id='ePinned'"+(g.pinned?" checked":"")+"> 置顶</label></div>"+
@@ -750,7 +854,7 @@ function approvePending(i){
   openModal("<h3>通过前确认</h3>"+
     "<div class='form-row'><label>群名</label><input id='eName' value='"+esc(tmp.name)+"'></div>"+
     "<div class='form-row'><label>标签</label><input id='eTags' value='"+esc((tmp.tags||[]).join("，"))+"'></div>"+
-    "<div class='form-row'><label>分区</label><select id='eSec'>"+SECTIONS.map(function(L){return "<option value='"+L+"'"+(tmp.section===L?" selected":"")+">"+L+"</option>"}).join("")+"</select></div>"+
+    "<div class='form-row'><label>分区</label><select id='eSec'>"+sectionList().map(function(L){return "<option value='"+L+"'"+(tmp.section===L?" selected":"")+">"+L+"</option>"}).join("")+"</select></div>"+
     "<div class='form-row'><label>群号</label><textarea id='eIds' rows='4'>"+esc(idLines)+"</textarea></div>"+
     "<div class='form-row'><label>备注</label><input id='eExtra' value='"+esc(tmp.extra||"")+"'></div>"+
     "<div class='form-row'><label><input type='checkbox' id='ePinned'> 置顶</label> <label><input type='checkbox' id='eMissing'> 暂缺</label></div>"+
@@ -880,7 +984,7 @@ function buildPlainDocument(){
   var s=DATA,lines=[s.title||"游戏王群索引","",s.subtitle?"（"+String(s.subtitle).replace(/^（|）$/g,"")+"）":"","*最后更新于："+s.updated];
   s.groups.filter(function(g){return g.pinned}).forEach(function(g){lines.push("**"+formatLine(g))});
   lines.push("","说明：","",ensureAboutFeedback(s),"");
-  SECTIONS.forEach(function(L){var rows=s.groups.filter(function(g){return g.section===L});if(!rows.length)return;lines.push(L==="其他"?"其他：":L);rows.forEach(function(g){lines.push(formatLine(g))});lines.push("")});
+  sectionList().forEach(function(L){var rows=s.groups.filter(function(g){return g.section===L});if(!rows.length)return;lines.push(L==="其他"?"其他：":L);rows.forEach(function(g){lines.push(formatLine(g))});lines.push("")});
   lines.push("实用连接：");(s.links||[]).forEach(function(L){lines.push((L.label||"")+"："+(L.url||""))});
   return lines.filter(function(x,i,a){return !(x===""&&a[i-1]==="")}).join("\n");
 }
@@ -890,7 +994,7 @@ function buildWordHtml(){
     "<h1>"+esc(s.title)+"</h1>",s.subtitle?"<p>（"+esc(s.subtitle)+"）</p>":"","<p><b>*最后更新于："+esc(s.updated)+"</b></p>"];
   s.groups.filter(function(g){return g.pinned}).forEach(function(g){h.push("<p><b>**"+esc(g.name)+"：</b>"+formatIdsHtml(g)+"</p>")});
   h.push("<h2>说明：</h2>");esc(ensureAboutFeedback(s)).split(/\n/).forEach(function(line){h.push("<p>"+(line||"&nbsp;")+"</p>")});
-  SECTIONS.forEach(function(L){var rows=s.groups.filter(function(g){return g.section===L});if(!rows.length)return;h.push("<p class='sec'>"+(L==="其他"?"其他：":L)+"</p>");rows.forEach(function(g){h.push("<p>"+esc(g.name)+"："+formatIdsHtml(g)+(g.extra?" "+esc(g.extra):"")+"</p>")})});
+  sectionList().forEach(function(L){var rows=s.groups.filter(function(g){return g.section===L});if(!rows.length)return;h.push("<p class='sec'>"+(L==="其他"?"其他：":L)+"</p>");rows.forEach(function(g){h.push("<p>"+esc(g.name)+"："+formatIdsHtml(g)+(g.extra?" "+esc(g.extra):"")+"</p>")})});
   h.push("<h2>实用连接：</h2>");(s.links||[]).forEach(function(L){h.push("<p>"+esc(L.label)+"：<a href='"+esc(L.url)+"'>"+esc(L.url)+"</a></p>")});
   return h.join("")+"</body></html>";
 }
