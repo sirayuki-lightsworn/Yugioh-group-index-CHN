@@ -34,8 +34,12 @@
   ],
   "groups": [
     {
+      "id": "featured",
       "name": "Angelechy（TCG 1401 先行 象棋卡组）",
       "aliases": [
+        "TCG 1401 先行 象棋卡组"
+      ],
+      "tags": [
         "TCG 1401 先行 象棋卡组"
       ],
       "section": "A",
@@ -49,16 +53,17 @@
           "num": "1027246764",
           "note": "",
           "dead": false
+        },
+        {
+          "num": "1234567",
+          "note": "测试",
+          "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "featured": true,
-      "id": "featured",
       "pinned": true,
-      "tags": [
-        "TCG 1401 先行 象棋卡组"
-      ]
+      "addedAt": 1789344360557
     },
     {
       "name": "ABC",
@@ -716,7 +721,7 @@
       "nameStruck": false,
       "id": "g29",
       "tags": [],
-      "pinned": true
+      "pinned": false
     },
     {
       "name": "超重武者",
@@ -5662,7 +5667,7 @@
       ],
       "extra": "",
       "missing": false,
-      "pinned": true,
+      "pinned": false,
       "addedAt": 1789342849321
     },
     {
@@ -7427,7 +7432,7 @@
       "tags": [
         "升月"
       ],
-      "pinned": true
+      "pinned": false
     },
     {
       "name": "异解△",
