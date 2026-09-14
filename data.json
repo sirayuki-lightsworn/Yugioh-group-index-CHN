@@ -53,11 +53,6 @@
           "num": "1027246764",
           "note": "",
           "dead": false
-        },
-        {
-          "num": "1234567",
-          "note": "测试",
-          "dead": false
         }
       ],
       "extra": "",
@@ -7450,7 +7445,7 @@
       "nameStruck": false,
       "id": "g347",
       "tags": [],
-      "pinned": true
+      "pinned": false
     },
     {
       "name": "自奏圣乐/自鸣天琴",
