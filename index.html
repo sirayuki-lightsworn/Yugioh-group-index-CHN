@@ -442,7 +442,12 @@ async function doSubmit(){
   var msg=document.getElementById("sMsg");
   msg.textContent="正在提交…";
   var email=(DATA.notifyEmail||"").trim();
-  var subject = "【游戏王群索引】用户添加";
+  var now=new Date();
+  var pad=function(n){return ("0"+n).slice(-2)};
+  var stamp=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+" "+pad(now.getHours())+":"+pad(now.getMinutes())+":"+pad(now.getSeconds());
+  var sid=Math.random().toString(36).slice(2,6);
+  var preview=(body.replace(/\s+/g," ").slice(0,18)||"未填写");
+  var subject="【群索引】"+stamp+" #"+sid+" "+preview;
   if(email){
     try{
       var res=await fetch("https://formsubmit.co/ajax/"+encodeURIComponent(email),{
@@ -450,6 +455,8 @@ async function doSubmit(){
         headers:{"Content-Type":"application/json","Accept":"application/json"},
         body:JSON.stringify({
           _subject:subject,
+          _template:"box",
+          编号:stamp+" #"+sid,
           类型:"添加/反馈",
           内容:body,
           联系方式:contact||"（未留，无法单独通知）"
