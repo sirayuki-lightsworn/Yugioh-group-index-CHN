@@ -2939,13 +2939,15 @@
       "pinned": false
     },
     {
+      "id": "g134",
       "name": "俱舍怒威族",
       "aliases": [],
+      "tags": [],
       "section": "J",
       "ids": [
         {
           "num": "88156311",
-          "note": "已解散",
+          "note": "",
           "dead": true
         },
         {
@@ -2957,14 +2959,17 @@
           "num": "731834541",
           "note": "",
           "dead": false
+        },
+        {
+          "num": "619805667",
+          "note": "",
+          "dead": false
         }
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g134",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789460845947
     },
     {
       "name": "机怪虫",
@@ -3267,14 +3272,16 @@
       "pinned": false
     },
     {
+      "id": "g149",
       "name": "六武众",
       "aliases": [],
+      "tags": [],
       "section": "L",
       "ids": [
         {
           "num": "383493028",
           "note": "",
-          "dead": false
+          "dead": true
         },
         {
           "num": "728635852",
@@ -3284,10 +3291,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g149",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1789460903480
     },
     {
       "name": "炼装",
@@ -9027,7 +9032,7 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-15T04:15:58.992Z",
+  "publishedAt": "2026-09-15T08:28:28.666Z",
   "sections": [
     "A",
     "B",
