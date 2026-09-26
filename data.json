@@ -1874,30 +1874,6 @@
       "pinned": false
     },
     {
-      "id": "g83",
-      "name": "南瓜王",
-      "aliases": [
-        "活死人的呼声",
-        "活呼"
-      ],
-      "tags": [
-        "活死人的呼声",
-        "活呼"
-      ],
-      "section": "G",
-      "ids": [
-        {
-          "num": "811123353",
-          "note": "",
-          "dead": false
-        }
-      ],
-      "extra": "",
-      "missing": false,
-      "pinned": false,
-      "addedAt": 1789372412848
-    },
-    {
       "name": "GMX（TCG 1304先行恐龙主题）",
       "aliases": [
         "TCG 1304先行恐龙主题"
@@ -2278,8 +2254,12 @@
       "pinned": false
     },
     {
-      "name": "火灵天星（@Ignister）",
+      "id": "g101",
+      "name": "火灵天星",
       "aliases": [
+        "@Ignister"
+      ],
+      "tags": [
         "@Ignister"
       ],
       "section": "H",
@@ -2292,12 +2272,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g101",
-      "tags": [
-        "@Ignister"
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1790404778461
     },
     {
       "name": "海造贼",
@@ -3142,8 +3118,12 @@
       "pinned": false
     },
     {
-      "name": "科技属（T.G.）",
+      "id": "g142",
+      "name": "科技属",
       "aliases": [
+        "T.G."
+      ],
+      "tags": [
         "T.G."
       ],
       "section": "K",
@@ -3161,12 +3141,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": true,
-      "id": "g142",
-      "tags": [
-        "T.G."
-      ],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1790404874131
     },
     {
       "name": "卡通",
@@ -4480,6 +4456,30 @@
       "pinned": false
     },
     {
+      "id": "g83",
+      "name": "南瓜王",
+      "aliases": [
+        "活死人的呼声",
+        "活呼"
+      ],
+      "tags": [
+        "活死人的呼声",
+        "活呼"
+      ],
+      "section": "N",
+      "ids": [
+        {
+          "num": "811123353",
+          "note": "",
+          "dead": false
+        }
+      ],
+      "extra": "",
+      "missing": false,
+      "pinned": false,
+      "addedAt": 1790404694133
+    },
+    {
       "name": "破械",
       "aliases": [],
       "section": "P",
@@ -5754,13 +5754,15 @@
       "pinned": false
     },
     {
+      "id": "g263",
       "name": "铁兽战线",
       "aliases": [],
+      "tags": [],
       "section": "T",
       "ids": [
         {
           "num": "1136255234",
-          "note": "大群已恢复",
+          "note": "",
           "dead": false
         },
         {
@@ -5771,10 +5773,8 @@
       ],
       "extra": "",
       "missing": false,
-      "nameStruck": false,
-      "id": "g263",
-      "tags": [],
-      "pinned": false
+      "pinned": false,
+      "addedAt": 1790405126506
     },
     {
       "name": "天威",
@@ -8363,7 +8363,7 @@
       "tags": [
         "WAKE CUP!"
       ],
-      "section": "非字段卡组/均卡",
+      "section": "S",
       "ids": [
         {
           "num": "2156065365",
@@ -8374,7 +8374,7 @@
       "extra": "",
       "missing": false,
       "pinned": false,
-      "addedAt": 1789402113169
+      "addedAt": 1790405297655
     },
     {
       "id": "g1789400642382",
@@ -8398,7 +8398,7 @@
       "extra": "",
       "missing": false,
       "pinned": false,
-      "addedAt": 1789402116382
+      "addedAt": 1790405326562
     },
     {
       "id": "g387",
@@ -9105,7 +9105,7 @@
     "appId": "",
     "appKey": ""
   },
-  "publishedAt": "2026-09-26T06:31:08.276Z",
+  "publishedAt": "2026-09-26T06:49:10.822Z",
   "sections": [
     "A",
     "B",
